@@ -1,7 +1,7 @@
 %{
 //Cesário Ribeiro da Fonseca Andrade Silva - 2015230724
 //Pedro Carreiro Carvalho - 2017267408
-int flag = 0; 
+int flag = 0, linha=1, coluna=1; 
 %}
 
 numero               [0-9]
@@ -13,6 +13,12 @@ UNDERSCORE           [_]*
 CHAR                 [A-z]+
 RESERVED             "++"|"--"|"Integer"|"System"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"const"|"continue"|"do"|"enum"|"extends"|"final"|"finnaly"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"
 QUOTE                ["]
+OLCOMMENT            [//]
+STARTCOMMENT         [/*]
+FINISHCOMMENT        [*/]
+LINETERMINATOR       [\n]
+
+%xML_COMMENT
 
 %%
 
@@ -74,6 +80,13 @@ QUOTE                ["]
 
 <<EOF>>               {return 0;}
 
+
+{SINGLECOMMENT}.*         {;}
+{STARTCOMMENT}            {BEGIN(ML_COMMENT);}
+<ML_COMMENT>.             {coluna++;}
+<ML_COMMENT>{LINETERMINATOR}              {linha++; coluna=1}
+<ML_COMMENT><<EOF>>       {BEGIN 0; printf("Unterminated comment on Line %d, col %d\n", linha, coluna);}
+<ML_COMMENT>{FINISHCOMMENT}     {BEGIN 0;}
 %%
 
 int main(int argc, char *argv[]){
