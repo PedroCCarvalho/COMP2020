@@ -1,93 +1,125 @@
 %{
 //Cesário Ribeiro da Fonseca Andrade Silva - 2015230724
 //Pedro Carreiro Carvalho - 2017267408
-int flag = 0, linha=1, coluna=1; 
+
+#include <stdio.h>
+#include <string.h>
+#define LINHA linha++; coluna=1;
+#define COLUNA coluna+=yyleng;
+
+int flag = 0; 
+int linha = 1;
+int coluna = 1;
+int c_actual=1;
+int l_actual=1;
+int error=0;
+char save[256];
+
 %}
+
+%X STRINGLIT ML_COMMENT
 
 numero               [0-9]
 numNoZero            [1-9]+
-ID                   ([A-Z]|[a-z])+ 
+ID                   ([A-Z]|[a-z]|_|"$")+ 
 IDP                  ([A-Z]|[a-z]|_|"$"|[0-9])*
-WHITESPACE           [\f|\t| ]
+WHITESPACE           [\f|\t| |"\"|"\\"]
 UNDERSCORE           [_]*
 CHAR                 [A-z]+
-RESERVED             "++"|"--"|"Integer"|"System"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"const"|"continue"|"do"|"enum"|"extends"|"final"|"finnaly"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"
-QUOTE                ["]
-OLCOMMENT            [//]
-STARTCOMMENT         [/*]
-FINISHCOMMENT        [*/]
-LINETERMINATOR       [\n]
+RESERVED             "++"|"--"|"Integer"|"System"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"const"|"continue"|"do"|"enum"|"extends"|"final"|"finnaly"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"finally"|"char"
+QUOTE                \"
+LETTER               [a-z]
+SIGNAL               "+"|"-"
+ILLEGAL              "."|"#"|"º"|"ª"|"~"|"^"|"¨"|"«"|"»"
+REALS                "."|","
+EXPOENT              "e"|"E"
+ESCAPE              \\n|\\f|\\r|\\\\|\\\"|\\t
+STRLIT				([^\n\r\\\"]|{ESCAPE})*
+OLCOMMENT            "//"
+STARTCOMMENT         "/*"
+FINISHCOMMENT        "*/"
+LINETERMINATOR       "\n"
 
-%xML_COMMENT
 
 %%
 
-{RESERVED}       {if(flag==-1)printf("RESERVED\n");}
-"false"          {if(flag==-1)printf("BOOLIT(false)\n");}
-"true"            {if(flag==-1)printf("BOOLIT(true)\n");}
-"&&"              {if(flag==-1)printf("AND\n");}
-"="               {if(flag==-1)printf("ASSIGN\n");}
-"*"               {if(flag==-1)printf("STAR\n");}
-"/"               {if(flag==-1)printf("DIV\n");}
-","               {if(flag==-1)printf("COMMA\n");}
-"=="              {if(flag==-1)printf("EQ\n");}
-">="              {if(flag==-1)printf("GE\n");}
-">"               {if(flag==-1)printf("GT2\n");}
-"{"               {if(flag==-1)printf("LBRACE\n");}
-"<="              {if(flag==-1)printf("LE\n");}
-"("               {if(flag==-1)printf("LPAR\n");}
-"["               {if(flag==-1)printf("LSQ\n");}
-"<"               {if(flag==-1)printf("LT\n");}
-"-"               {if(flag==-1)printf("MINUS\n");}
-"%"               {if(flag==-1)printf("MOD\n");}
-"!="              {if(flag==-1)printf("NE\n");}
-"!"               {if(flag==-1)printf("NOT\n");}
-"||"              {if(flag==-1)printf("OR\n");}
-"+"               {if(flag==-1)printf("PLUS\n");}
-"}"               {if(flag==-1)printf("RBRACE\n");}
-")"               {if(flag==-1)printf("RPAR\n");}
-"]"               {if(flag==-1)printf("RSQ\n");}
-";"               {if(flag==-1)printf("SEMICOLON\n");}
-"->"              {if(flag==-1)printf("ARROW\n");}
-"<<"              {if(flag==-1)printf("LSHIFT\n");}
-">>"              {if(flag==-1)printf("RSHIFT\n");}
-"^"               {if(flag==-1)printf("XOR\n");}
-"boolean"         {if(flag==-1)printf("BOOL\n");}
-"class"           {if(flag==-1)printf("CLASS\n");}
-".length"         {if(flag==-1)printf("DOTLENGTH\n");}
-"double"          {if(flag==-1)printf("DOUBLE\n");}
-"else"            {if(flag==-1)printf("ELSE\n");}
-"if"              {if(flag==-1)printf("IF\n");}
-"int"             {if(flag==-1)printf("INT\n");}
-"System.out.print"    {if(flag==-1)printf("PRINT\n");}
-"Integer.parseInt"    {if(flag==-1)printf("PARSEINT\n");}
-"public"          {if(flag==-1)printf("PUBLIC\n");}
-"static"          {if(flag==-1)printf("STATIC\n");}
-"String"          {if(flag==-1)printf("STRING\n");}
-"void"            {if(flag==-1)printf("VOID\n");}
-"while"           {if(flag==-1)printf("WHILE\n");}
-"return"          {if(flag==-1)printf("RETURN\n");}
-{QUOTE}{CHAR}{QUOTE}          {printf("if(flag==-1)STRLIT(%s)\n", yytext);}
-{WHITESPACE}           {;}
-"\n"                {;}
-"\r"                {;}
-"\r\n"              {;}
-{QUOTE}             {;}
-"0"             {if(flag==-1)printf("INTLIT(0)\n");}
-{numNoZero}{numero} {if(flag==-1)printf("INTLIT(%s)\n", yytext);}
-{numNoZero}({UNDERSCORE}{numero}+)* {if(flag==-1)printf("INTLIT(%s)\n", yytext);}
-{ID}{IDP}       {if(flag==-1)printf("ID(%s)\n", yytext);}
+{RESERVED}       {if(flag==-1)printf("RESERVED(%s)\n", yytext);COLUNA;}
+"false"          {if(flag==-1)printf("BOOLIT(false)\n");COLUNA;}
+"true"            {if(flag==-1)printf("BOOLIT(true)\n");COLUNA;}
+"&&"              {if(flag==-1)printf("AND\n");COLUNA;}
+"="               {if(flag==-1)printf("ASSIGN\n");COLUNA;}
+"*"               {if(flag==-1)printf("STAR\n");COLUNA;}
+"//"              {;}
+"/"               {if(flag==-1)printf("DIV\n");COLUNA;}
+","               {if(flag==-1)printf("COMMA\n");COLUNA;}
+"=="              {if(flag==-1)printf("EQ\n");COLUNA;}
+">="              {if(flag==-1)printf("GE\n");COLUNA;}
+">"               {if(flag==-1)printf("GT\n");COLUNA;}
+"{"               {if(flag==-1)printf("LBRACE\n");COLUNA;}
+"<="              {if(flag==-1)printf("LE\n");COLUNA;}
+"("               {if(flag==-1)printf("LPAR\n");COLUNA;}
+"["               {if(flag==-1)printf("LSQ\n");COLUNA;}
+"<"               {if(flag==-1)printf("LT\n");COLUNA;}
+"-"               {if(flag==-1)printf("MINUS\n");COLUNA;}
+"%"               {if(flag==-1)printf("MOD\n");COLUNA;}
+"!="              {if(flag==-1)printf("NE\n");COLUNA;}
+"!"               {if(flag==-1)printf("NOT\n");COLUNA;}
+"||"              {if(flag==-1)printf("OR\n");COLUNA;}
+"+"               {if(flag==-1)printf("PLUS\n");COLUNA;}
+"}"               {if(flag==-1)printf("RBRACE\n");COLUNA;}
+")"               {if(flag==-1)printf("RPAR\n");COLUNA;}
+"]"               {if(flag==-1)printf("RSQ\n");COLUNA;}
+";"               {if(flag==-1)printf("SEMICOLON\n");COLUNA;}
+"->"              {if(flag==-1)printf("ARROW\n");COLUNA;}
+"<<"              {if(flag==-1)printf("LSHIFT\n");COLUNA;}
+">>"              {if(flag==-1)printf("RSHIFT\n");COLUNA;}
+"^"               {if(flag==-1)printf("XOR\n");COLUNA;}
+"boolean"         {if(flag==-1)printf("BOOL\n");COLUNA;}
+"class"           {if(flag==-1)printf("CLASS\n");COLUNA;}
+".length"         {if(flag==-1)printf("DOTLENGTH\n");COLUNA;}
+"double"          {if(flag==-1)printf("DOUBLE\n");COLUNA;}
+"else"            {if(flag==-1)printf("ELSE\n");COLUNA;}
+"if"              {if(flag==-1)printf("IF\n");COLUNA;}
+"int"             {if(flag==-1)printf("INT\n");COLUNA;}
+"System.out.print"    {if(flag==-1)printf("PRINT\n");COLUNA;}
+"Integer.parseInt"    {if(flag==-1)printf("PARSEINT\n");COLUNA;}
+"public"          {if(flag==-1)printf("PUBLIC\n");COLUNA;}
+"static"          {if(flag==-1)printf("STATIC\n");COLUNA;}
+"String"          {if(flag==-1)printf("STRING\n");COLUNA;}
+"void"            {if(flag==-1)printf("VOID\n");COLUNA;}
+"while"           {if(flag==-1)printf("WHILE\n");COLUNA;}
+"return"          {if(flag==-1)printf("RETURN\n");COLUNA;}
 
-<<EOF>>               {return 0;}
+{QUOTE}												{BEGIN STRINGLIT; strcat(save, yytext); l_actual= linha; c_actual= coluna;COLUNA; error=0;}
+<STRINGLIT>{STRLIT}									{COLUNA; strcat(save, yytext);}
+<STRINGLIT>\\(.?)									{printf("Line %d, col %d: invalid escape sequence (%s)\n", linha, coluna, yytext);COLUNA;error=1;}
+<STRINGLIT>{QUOTE}									{BEGIN 0;  strcat(save, yytext); if(error==0){printf("STRLIT(%s)\n",save);} COLUNA;save[0]=0;}
+<STRINGLIT><<EOF>>									{BEGIN 0; save[0]=0; printf("Line %d, col %d: unterminated string literal\n", l_actual, c_actual);LINHA;}
 
-
-{SINGLECOMMENT}.*         {;}
+{WHITESPACE}           {COLUNA;}
+"\n"                {LINHA;}
+"\r"                {LINHA;}
+"\r\n"              {LINHA;}
+"0"             {if(flag==-1)printf("INTLIT(0)\n");COLUNA;}
+{numNoZero}{numero} {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;}
+({UNDERSCORE}?{numero}+)*({REALS})?({UNDERSCORE}?{numero}+)*{EXPOENT}{SIGNAL}?({UNDERSCORE}?{numero}+)+     {if(flag==-1)printf("REALIT(%s)\n", yytext);COLUNA;}
+({UNDERSCORE}?{numero}+)*{REALS}({UNDERSCORE}?{numero}+)+      {if(flag==-1)printf("REALIT(%s)\n", yytext);COLUNA;}
+({UNDERSCORE}?{numero}+)+{REALS}({UNDERSCORE}?{numero}+)*      {if(flag==-1)printf("REALIT(%s)\n", yytext);COLUNA;}
+{numNoZero}({UNDERSCORE}{numero}+)*     {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;}
+{ID}{IDP}               {if(flag==-1)printf("ID(%s)\n", yytext);COLUNA;}
+{ILLEGAL}               {printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);COLUNA;}
+{OLCOMMENT}.*       {;}
 {STARTCOMMENT}            {BEGIN(ML_COMMENT);}
 <ML_COMMENT>.             {coluna++;}
-<ML_COMMENT>{LINETERMINATOR}              {linha++; coluna=1}
+<ML_COMMENT>{LINETERMINATOR}              {linha++; coluna=1;}
 <ML_COMMENT><<EOF>>       {BEGIN 0; printf("Unterminated comment on Line %d, col %d\n", linha, coluna);}
 <ML_COMMENT>{FINISHCOMMENT}     {BEGIN 0;}
+
 %%
+
+void yyerror (const char *s) { 
+     printf ("Line %d, col %d: %s: %s\n",linha,(int)(coluna-strlen(yytext)), s, yytext);
+}
 
 int main(int argc, char *argv[]){
     
@@ -95,6 +127,10 @@ int main(int argc, char *argv[]){
 
         if(strcmp(argv[1],"-l") == 0){
             flag = - 1;
+        }
+
+        if(strcmp(argv[1],"-e1") == 0){
+            flag = 1;
         }
     }
 
