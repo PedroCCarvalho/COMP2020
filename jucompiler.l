@@ -23,10 +23,10 @@ numero               [0-9]
 numNoZero            [1-9]+
 ID                   ([A-Z]|[a-z]|_|"$")+ 
 IDP                  ([A-Z]|[a-z]|_|"$"|[0-9])*
-WHITESPACE           [\f|\t| |"\"|"\\"]
+WHITESPACE           [\f|\t|" "|"\"|"\\"]
 UNDERSCORE           [_]*
 CHAR                 [A-z]+
-RESERVED             "++"|"--"|"Integer"|"System"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"const"|"continue"|"do"|"enum"|"extends"|"final"|"finnaly"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"finally"|"char"
+RESERVED             "++"|"--"|"Integer"|"System"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"const"|"continue"|"default"|"do"|"enum"|"extends"|"final"|"finnaly"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"finally"|"char"
 QUOTE                \"
 LETTER               [a-z]
 SIGNAL               "+"|"-"
@@ -44,8 +44,8 @@ LINETERMINATOR       \n|\r|\r\n
 %%
 
 {RESERVED}       {if(flag==-1)printf("RESERVED(%s)\n", yytext);COLUNA;}
-"false"          {if(flag==-1)printf("BOOLIT(false)\n");COLUNA;}
-"true"            {if(flag==-1)printf("BOOLIT(true)\n");COLUNA;}
+"false"          {if(flag==-1)printf("BOOLLIT(false)\n");COLUNA;}
+"true"            {if(flag==-1)printf("BOOLLIT(true)\n");COLUNA;}
 "&&"              {if(flag==-1)printf("AND\n");COLUNA;}
 "="               {if(flag==-1)printf("ASSIGN\n");COLUNA;}
 "*"               {if(flag==-1)printf("STAR\n");COLUNA;}
@@ -102,9 +102,9 @@ LINETERMINATOR       \n|\r|\r\n
 "\r\n"              {LINHA;}
 "0"             {if(flag==-1)printf("INTLIT(0)\n");COLUNA;}
 {numNoZero}{numero} {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;}
-({UNDERSCORE}?{numero}+)*({REALS})?({UNDERSCORE}?{numero}+)*{EXPOENT}{SIGNAL}?({UNDERSCORE}?{numero}+)+     {if(flag==-1)printf("REALIT(%s)\n", yytext);COLUNA;}
-({UNDERSCORE}?{numero}+)*{REALS}({UNDERSCORE}?{numero}+)+      {if(flag==-1)printf("REALIT(%s)\n", yytext);COLUNA;}
-({UNDERSCORE}?{numero}+)+{REALS}({UNDERSCORE}?{numero}+)*      {if(flag==-1)printf("REALIT(%s)\n", yytext);COLUNA;}
+({UNDERSCORE}?{numero}+)*({REALS})?({UNDERSCORE}?{numero}+)*{EXPOENT}{SIGNAL}?({UNDERSCORE}?{numero}+)+     {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;}
+({UNDERSCORE}?{numero}+)*{REALS}({UNDERSCORE}?{numero}+)+      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;}
+({UNDERSCORE}?{numero}+)+{REALS}({UNDERSCORE}?{numero}+)*      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;}
 {numNoZero}({UNDERSCORE}{numero}+)*     {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;}
 {ID}{IDP}               {if(flag==-1)printf("ID(%s)\n", yytext);COLUNA;}
 {ILLEGAL}               {printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);COLUNA;}
