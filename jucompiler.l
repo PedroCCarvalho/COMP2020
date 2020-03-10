@@ -38,7 +38,7 @@ STRLIT				([^\n\r\\\"]|{ESCAPE})*
 OLCOMMENT            "//"
 STARTCOMMENT         "/*"
 FINISHCOMMENT        "*/"
-LINETERMINATOR       "\n"
+LINETERMINATOR       \n|\r|\r\n
 
 
 %%
