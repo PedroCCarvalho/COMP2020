@@ -102,9 +102,9 @@ LINETERMINATOR       \n|\r|\r\n
 "\r\n"              {LINHA;}
 "0"             {if(flag==-1)printf("INTLIT(0)\n");COLUNA;}
 {numNoZero}{numero} {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;}
-({UNDERSCORE}?{numero}+)*({REALS})?({UNDERSCORE}?{numero}+)*{EXPOENT}{SIGNAL}?({UNDERSCORE}?{numero}+)+     {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;}
+((({UNDERSCORE}?{numero}+)+({REALS})?({UNDERSCORE}?{numero}+)*)|(({UNDERSCORE}?{numero}+)*({REALS})?({UNDERSCORE}?{numero}+)+)){EXPOENT}{SIGNAL}?({UNDERSCORE}?{numero}+)+     {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;}
 ({UNDERSCORE}?{numero}+)*{REALS}({UNDERSCORE}?{numero}+)+      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;}
-({UNDERSCORE}?{numero}+)+{REALS}({UNDERSCORE}?{numero}+)*      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;}
+({UNDERSCORE}?{numero}+)+{REALS}({UNDERSCORE}?{numero}+)*     {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;}
 {numNoZero}({UNDERSCORE}{numero}+)*     {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;}
 {ID}{IDP}               {if(flag==-1)printf("ID(%s)\n", yytext);COLUNA;}
 {ILLEGAL}               {printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);COLUNA;}
