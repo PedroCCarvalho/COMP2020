@@ -7,7 +7,7 @@
 #define LINHA linha++; coluna=1;
 #define COLUNA coluna+=yyleng;
 
-int flag = 0;
+int flag = 0; 
 int linha = 1;
 int coluna = 1;
 int c_actual=1;
@@ -30,18 +30,17 @@ RESERVED             "++"|"--"|"Integer"|"System"|"null"|"abstract"|"assert"|"br
 QUOTE                \"
 LETTER               [a-z]
 SIGNAL               "+"|"-"
-ILLEGAL              "."|"#"|"º"|"ª"|"~"|"^"|"¨"|"«"|"»"
+ILLEGAL              "."|"#"|"º"|"ª"|"~"|"^"|"¨"|"«"|"»"|"&"|"?"|"|"|"'"|"`"|"|"
 REALS                "."|","
 EXPOENT              "e"|"E"
 ESCAPE              \\n|\\f|\\r|\\\\|\\\"|\\t
-NOESCAPE            \\.
 STRLIT				([^\n\r\\\"]|{ESCAPE})*
 OLCOMMENT            "//"
 STARTCOMMENT         "/*"
 FINISHCOMMENT        "*/"
 LINETERMINATOR       \n|\r|\r\n
 
-
+ 
 %%
 
 {RESERVED}       {if(flag==-1)printf("RESERVED(%s)\n", yytext);COLUNA;}
@@ -50,6 +49,7 @@ LINETERMINATOR       \n|\r|\r\n
 "&&"              {if(flag==-1)printf("AND\n");COLUNA;}
 "="               {if(flag==-1)printf("ASSIGN\n");COLUNA;}
 "*"               {if(flag==-1)printf("STAR\n");COLUNA;}
+"//"              {;}
 "/"               {if(flag==-1)printf("DIV\n");COLUNA;}
 ","               {if(flag==-1)printf("COMMA\n");COLUNA;}
 "=="              {if(flag==-1)printf("EQ\n");COLUNA;}
@@ -91,33 +91,27 @@ LINETERMINATOR       \n|\r|\r\n
 "return"          {if(flag==-1)printf("RETURN\n");COLUNA;}
 
 {QUOTE}												{BEGIN STRINGLIT; strcat(save, yytext); l_actual= linha; c_actual= coluna;COLUNA; error=0;}
-<STRINGLIT>{QUOTE}									{BEGIN 0;  strcat(save, yytext); if(error==0){printf("STRLIT(%s)\n",save);} COLUNA;save[0]=0;}
 <STRINGLIT>{STRLIT}									{COLUNA; strcat(save, yytext);}
 <STRINGLIT>\\(.?)									{printf("Line %d, col %d: invalid escape sequence (%s)\n", linha, coluna, yytext);COLUNA;error=1;}
-<STRINGLIT>{LINETERMINATOR}                         {BEGIN 0;linha++; coluna=1;printf("Line %d, col %d: unterminated string literal\n", l_actual, c_actual);save[0]=0;}
+<STRINGLIT>{QUOTE}									{BEGIN 0; strcat(save, yytext); if(error==0){printf("STRLIT(%s)\n",save);} COLUNA;save[0]=0;}
+<STRINGLIT><<EOF>>									{BEGIN 0; save[0]=0; printf("Line %d, col %d: unterminated string literal\n", l_actual, c_actual);LINHA;}
+<STRINGLIT>{LINETERMINATOR}                                      {printf("Line %d, col %d: unterminated string literal\n", linha, c_actual);LINHA;BEGIN 0; save[0]=0;}
 
 {WHITESPACE}           {COLUNA;}
-"\n"                {LINHA;}
-"\r"                {LINHA;}
-"\r\n"              {LINHA;}
+{LINETERMINATOR}       {LINHA;}
 "0"             {if(flag==-1)printf("INTLIT(0)\n");COLUNA;}
 {numNoZero}{numero} {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;}
 ((({UNDERSCORE}?{numero}+)+({REALS})?({UNDERSCORE}?{numero}+)*)|(({UNDERSCORE}?{numero}+)*({REALS})?({UNDERSCORE}?{numero}+)+)){EXPOENT}{SIGNAL}?({UNDERSCORE}?{numero}+)+     {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;}
 ({UNDERSCORE}?{numero}+)*{REALS}({UNDERSCORE}?{numero}+)+      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;}
-({UNDERSCORE}?{numero}+)+{REALS}({UNDERSCORE}?{numero}+)*     {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;}
+({UNDERSCORE}?{numero}+)+{REALS}({UNDERSCORE}?{numero}+)*      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;}
 {numNoZero}({UNDERSCORE}{numero}+)*     {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;}
-{ID}{IDP}               {if(flag==-1)printf("ID(%s)\n", yytext);COLUNA;}
-{ILLEGAL}               {printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);COLUNA;}
-
-
-{OLCOMMENT}.*                     {linha++;coluna+=yyleng;}
-
-
-
-{STARTCOMMENT}                  {BEGIN(ML_COMMENT);}
-<ML_COMMENT>{LINETERMINATOR}   {linha++; coluna=1;}
-<ML_COMMENT>.                   {coluna++;}
-<ML_COMMENT><<EOF>>             {BEGIN 0; printf("Line %d, col %d: unterminated comment\n", coluna, linha);}
+{ID}{IDP}                 {if(flag==-1)printf("ID(%s)\n", yytext);COLUNA;}
+{ILLEGAL}                 {printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);COLUNA;}
+{OLCOMMENT}.*             {;}
+{STARTCOMMENT}            {BEGIN(ML_COMMENT); c_actual = coluna; l_actual = linha;}
+<ML_COMMENT>.             {COLUNA;}
+<ML_COMMENT>{LINETERMINATOR}              {LINHA;}
+<ML_COMMENT><<EOF>>       {printf("Line %d, col %d: unterminated comment\n", l_actual, c_actual); BEGIN 0;}
 <ML_COMMENT>{FINISHCOMMENT}     {BEGIN 0;}
 
 %%
