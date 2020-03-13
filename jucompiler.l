@@ -23,14 +23,13 @@ numero               [0-9]
 numNoZero            [1-9]+
 ID                   ([A-Z]|[a-z]|_|"$")+ 
 IDP                  ([A-Z]|[a-z]|_|"$"|[0-9])*
-WHITESPACE           [\f|\t|" "|"\"|"\\"]
+WHITESPACE           [\f|\t|" "]
 UNDERSCORE           [_]*
 CHAR                 [A-z]+
-RESERVED             "++"|"--"|"Integer"|"System"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"const"|"continue"|"default"|"do"|"enum"|"extends"|"final"|"finnaly"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"finally"|"char"
+RESERVED             "++"|"--"|"Integer"|"System"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"const"|"continue"|"default"|"do"|"enum"|"extends"|"final"|"finally"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"finally"|"char"
 QUOTE                \"
 LETTER               [a-z]
 SIGNAL               "+"|"-"
-ILLEGAL              "."|"#"|"º"|"ª"|"~"|"^"|"¨"|"«"|"»"|"&"|"?"|"|"|"'"|"`"|"|"
 REALS                "."|","
 EXPOENT              "e"|"E"
 ESCAPE              \\n|\\f|\\r|\\\\|\\\"|\\t
@@ -53,8 +52,8 @@ LINETERMINATOR       \n|\r|\r\n
 "/"               {if(flag==-1)printf("DIV\n");COLUNA;}
 ","               {if(flag==-1)printf("COMMA\n");COLUNA;}
 "=="              {if(flag==-1)printf("EQ\n");COLUNA;}
-">="              {if(flag==-1)printf("GE\n");COLUNA;}
 ">"               {if(flag==-1)printf("GT\n");COLUNA;}
+">="              {if(flag==-1)printf("GE\n");COLUNA;}
 "{"               {if(flag==-1)printf("LBRACE\n");COLUNA;}
 "<="              {if(flag==-1)printf("LE\n");COLUNA;}
 "("               {if(flag==-1)printf("LPAR\n");COLUNA;}
@@ -106,13 +105,15 @@ LINETERMINATOR       \n|\r|\r\n
 ({UNDERSCORE}?{numero}+)+{REALS}({UNDERSCORE}?{numero}+)*      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;}
 {numNoZero}({UNDERSCORE}{numero}+)*     {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;}
 {ID}{IDP}                 {if(flag==-1)printf("ID(%s)\n", yytext);COLUNA;}
-{ILLEGAL}                 {printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);COLUNA;}
+
 {OLCOMMENT}.*             {;}
 {STARTCOMMENT}            {BEGIN(ML_COMMENT); c_actual = coluna; l_actual = linha;}
 <ML_COMMENT>.             {COLUNA;}
 <ML_COMMENT>{LINETERMINATOR}              {LINHA;}
 <ML_COMMENT><<EOF>>       {printf("Line %d, col %d: unterminated comment\n", l_actual, c_actual); BEGIN 0;}
 <ML_COMMENT>{FINISHCOMMENT}     {BEGIN 0;}
+
+.                               {printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);COLUNA;}
 
 %%
 
