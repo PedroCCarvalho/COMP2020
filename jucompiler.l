@@ -42,6 +42,8 @@ LINETERMINATOR       \n|\r|\r\n
  
 %%
 
+"|"                             {printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);COLUNA;}
+
 {OLCOMMENT}                     {BEGIN OL_COMMENT;}
 <OL_COMMENT>{LINETERMINATOR}    {LINHA;BEGIN 0;}
 <OL_COMMENT>.                   {COLUNA;}
