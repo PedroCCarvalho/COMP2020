@@ -17,7 +17,7 @@ char save[256];
 
 %}
 
-%X STRINGLIT ML_COMMENT
+%X STRINGLIT ML_COMMENT OL_COMMENT
 
 numero               [0-9]
 numNoZero            [1-9]+
@@ -42,13 +42,22 @@ LINETERMINATOR       \n|\r|\r\n
  
 %%
 
+{OLCOMMENT}                     {BEGIN OL_COMMENT;}
+<OL_COMMENT>{LINETERMINATOR}    {LINHA;BEGIN 0;}
+<OL_COMMENT>.                   {COLUNA;}
+
+{STARTCOMMENT}                  {c_actual = coluna; l_actual = linha;COLUNA;BEGIN(ML_COMMENT);}
+<ML_COMMENT>{LINETERMINATOR}    {LINHA;}
+<ML_COMMENT>.                   {COLUNA;}
+<ML_COMMENT><<EOF>>             {printf("Line %d, col %d: unterminated comment\n", l_actual, c_actual); return 0;}
+<ML_COMMENT>{FINISHCOMMENT}     {COLUNA;BEGIN 0;}
+
 {RESERVED}       {if(flag==-1)printf("RESERVED(%s)\n", yytext);COLUNA;}
 "false"          {if(flag==-1)printf("BOOLLIT(false)\n");COLUNA;}
 "true"            {if(flag==-1)printf("BOOLLIT(true)\n");COLUNA;}
 "&&"              {if(flag==-1)printf("AND\n");COLUNA;}
 "="               {if(flag==-1)printf("ASSIGN\n");COLUNA;}
 "*"               {if(flag==-1)printf("STAR\n");COLUNA;}
-"//"              {;}
 "/"               {if(flag==-1)printf("DIV\n");COLUNA;}
 ","               {if(flag==-1)printf("COMMA\n");COLUNA;}
 "=="              {if(flag==-1)printf("EQ\n");COLUNA;}
@@ -106,14 +115,9 @@ LINETERMINATOR       \n|\r|\r\n
 {numNoZero}({UNDERSCORE}{numero}+)*     {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;}
 {ID}{IDP}                 {if(flag==-1)printf("ID(%s)\n", yytext);COLUNA;}
 
-{OLCOMMENT}.*             {;}
-{STARTCOMMENT}            {BEGIN(ML_COMMENT); c_actual = coluna; l_actual = linha;}
-<ML_COMMENT>.             {COLUNA;}
-<ML_COMMENT>{LINETERMINATOR}              {LINHA;}
-<ML_COMMENT><<EOF>>       {printf("Line %d, col %d: unterminated comment\n", l_actual, c_actual); BEGIN 0;}
-<ML_COMMENT>{FINISHCOMMENT}     {BEGIN 0;}
 
-.                               {printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);COLUNA;}
+
+.                         {printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);COLUNA;}
 
 %%
 
