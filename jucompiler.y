@@ -9,15 +9,21 @@
 
 %type <string> Program MethodDecl FieldDecl AdditionalDecl Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs ExprMath ExprLogic ExprCompare Expr Signal
 
-%left STAR DIV MOD
-%left PLUS MINUS
-%left RSHIFT LSHIFT
-%left LE GT LT GE
-%left EQ NE
-%left XOR
-%left AND
+
+%left COMMA
+%right ASSIGN
 %left OR
-%left ASSIGN
+%left AND
+%left BITWISEOR
+%left BITWISEXOR
+%left BITWISEAND
+%left EQ NE
+%left GE GT LT LE
+%left PLUS MINUS 
+%left MOD DIV MUL
+%left SIGNAL
+%right NOT
+%left LPAR
 
 %%
 
