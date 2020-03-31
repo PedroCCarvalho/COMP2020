@@ -7,6 +7,17 @@
 %token AND ASSIGN STAR DIV COMMA EQ GT GE LBRACE LE LPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RPAR RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGHT DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC STATIC STRING VOID WHILE RETURN
 %token <string> ID STRLIT REALLIT RESERVED INTLIT
 
+%left STAR DIV MOD
+%left PLUS MINUS
+%left RSHIFT LSHIFT
+%left LE GT LT GE
+%left EQ NE
+%left XOR
+%left AND
+%left OR
+%left ASSIGN
+
+
 %%
 
 Program: CLASS ID LBRACE MethodDecl RBRACE {$$ =$1;} 
@@ -53,8 +64,8 @@ Statement:LBRACE Statement RBRACE {$$ = $1;}
         |MethodInvocation SEMICOLON{$$ = $1;}
         |Assignment SEMICOLON {$$ = $1;}
         |ParseArgs SEMICOLON {$$ = $1;}
-        |PRINT LPAR Expr RPAR SEMICOLON {$$ = $1;}
-        |PRINT LPAR STRLIT RPAR SEMICOLON {$$ = $1;}
+        |PRINT LPAR Expr RPAR SEMICOLON {printf("%d\n", $3);}
+        |PRINT LPAR STRLIT RPAR SEMICOLON {printf("%d\n", $3);}
         ;
 
 AdditionalExpr: COMMA Expr {$$ = $1;}
@@ -111,10 +122,6 @@ Expr: ExprMath {$$ = $1;}
     | REALLIT {$$ = $1;}
     | BOOLLIT {$$ = $1;}
     ;
-
-calc: expression                        {printf("%d\n", $1);}
-
-
 
 
 %%
