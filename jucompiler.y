@@ -1,5 +1,6 @@
 %{
     #include <stdio.h>
+    #include "y.tab.h"
     int yylex(void);
     void yyerror (const char *s);
 %}
@@ -67,8 +68,8 @@ Statement:LBRACE Statement RBRACE {;}
         |MethodInvocation SEMICOLON{;}
         |Assignment SEMICOLON {;}
         |ParseArgs SEMICOLON {;}
-        |PRINT LPAR Expr RPAR SEMICOLON {printf("%d\n", $3);}
-        |PRINT LPAR STRLIT RPAR SEMICOLON {printf("%d\n", $3);}
+        |PRINT LPAR Expr RPAR SEMICOLON {;}
+        |PRINT LPAR STRLIT RPAR SEMICOLON {;}
         ;
 
 AdditionalExpr: COMMA Expr {;}

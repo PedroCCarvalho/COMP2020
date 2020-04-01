@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "y.tab.h"
 #define LINHA linha++; coluna=1;
 #define COLUNA coluna+=yyleng;
 
@@ -87,7 +88,7 @@ UNARY                "++"|"--"
 "^"               {if(flag==-1)printf("XOR\n");COLUNA;if(flag==2) return XOR;}
 "boolean"         {if(flag==-1)printf("BOOL\n");COLUNA;if(flag==2) return BOOL;}
 "class"           {if(flag==-1)printf("CLASS\n");COLUNA;if(flag==2) return CLASS;}
-".length"         {if(flag==-1)printf("DOTLENGTH\n");COLUNA;if(flag==2) return DOTLENGTH;}
+".length"         {if(flag==-1)printf("DOTLENGTH\n");COLUNA;if(flag==2) return DOTLENGHT;}
 "double"          {if(flag==-1)printf("DOUBLE\n");COLUNA;if(flag==2) return DOUBLE;}
 "else"            {if(flag==-1)printf("ELSE\n");COLUNA;if(flag==2) return ELSE;}
 "if"              {if(flag==-1)printf("IF\n");COLUNA;if(flag==2) return IF;}
@@ -110,13 +111,13 @@ UNARY                "++"|"--"
 
 {WHITESPACE}           {COLUNA;}
 {LINETERMINATOR}       {LINHA;}
-"0"             {if(flag==-1)printf("INTLIT(0)\n");COLUNA;if(flag==2) return "INTLIT";}
-{numNoZero}{numero} {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;if(flag==2) return "INTLIT";}
-((({UNDERSCORE}?{numero}+)+({REALS})?({UNDERSCORE}?{numero}+)*)|(({UNDERSCORE}?{numero}+)*({REALS})?({UNDERSCORE}?{numero}+)+)){EXPOENT}{SIGNAL}?({UNDERSCORE}?{numero}+)+     {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flag==2) return "REALLIT";}
-({UNDERSCORE}?{numero}+)*{REALS}({UNDERSCORE}?{numero}+)+      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flag==2) return "REALLIT";}
-({UNDERSCORE}?{numero}+)+{REALS}({UNDERSCORE}?{numero}+)*      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flag==2) return "REALLIT";}
-{numNoZero}({UNDERSCORE}{numero}+)*     {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;if(flag==2) return "INTLIT";}
-{ID}{IDP}                 {if(flag==-1)printf("ID(%s)\n", yytext);COLUNA;if(flag==2) return "ID";}
+"0"             {if(flag==-1)printf("INTLIT(0)\n");COLUNA;if(flag==2) return INTLIT;}
+{numNoZero}{numero} {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;if(flag==2) return INTLIT;}
+((({UNDERSCORE}?{numero}+)+({REALS})?({UNDERSCORE}?{numero}+)*)|(({UNDERSCORE}?{numero}+)*({REALS})?({UNDERSCORE}?{numero}+)+)){EXPOENT}{SIGNAL}?({UNDERSCORE}?{numero}+)+     {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flag==2) return REALLIT;}
+({UNDERSCORE}?{numero}+)*{REALS}({UNDERSCORE}?{numero}+)+      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flag==2) return REALLIT;}
+({UNDERSCORE}?{numero}+)+{REALS}({UNDERSCORE}?{numero}+)*      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flag==2) return REALLIT;}
+{numNoZero}({UNDERSCORE}{numero}+)*     {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;if(flag==2) return INTLIT;}
+{ID}{IDP}                 {if(flag==-1)printf("ID(%s)\n", yytext);COLUNA;if(flag==2) return ID;}
 
 
 
