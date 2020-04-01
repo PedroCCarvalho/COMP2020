@@ -7,33 +7,40 @@
 
 
 %union{
-int test;
+ char* test;
 
 }
 
 %token AND ASSIGN STAR DIV COMMA EQ GT GE LBRACE LE LPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RPAR RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGHT DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC STATIC STRING VOID WHILE RETURN
-%token <string> ID STRLIT REALLIT RESERVED INTLIT BOOLLIT
+%token <test> ID STRLIT REALLIT RESERVED INTLIT BOOLLIT
 
-%type <string> Program MethodDecl FieldDecl AdditionalDecl Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs ExprMath ExprLogic ExprCompare Expr Signal
+%type <test> Program MethodDecl StatementAux1 FieldDecl StatementAux AdditionalDecl FormalParamsAux MethodBodyAux Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs Expr Signal ProgramAux
 
+%left COMMA
 %right ASSIGN
-%left AND
 %left OR
+%left AND
 %left XOR
-%left EQ NE
-%left LE GT LT GE
+%left EQ NE LE GT LT GE
 %left RSHIFT LSHIFT
 %left PLUS MINUS
 %left STAR DIV MOD
+%left UNARY
 %left LPAR LSQ RPAR RSQ
-%left NOT UNARY
+%nonassoc ELSE
+%nonassoc IF
+
 
 %%
 
-Program: CLASS ID LBRACE MethodDecl RBRACE {;} 
-        |CLASS ID LBRACE FieldDecl RBRACE {;}
-        |CLASS ID LBRACE SEMICOLON RBRACE {;}
+Program: CLASS ID LBRACE ProgramAux RBRACE {;} 
         ;
+
+ProgramAux: MethodDecl ProgramAux{;}
+           |FieldDecl  ProgramAux{;}
+           |SEMICOLON  ProgramAux{;}
+           |/*gvazio*/     {;}
+           ;
 
 MethodDecl: PUBLIC STATIC MethodHeader MethodBody {;}
             ;
@@ -42,8 +49,8 @@ FieldDecl: PUBLIC STATIC Type ID SEMICOLON {;}
           |PUBLIC STATIC Type ID AdditionalDecl SEMICOLON {;}
           ;
 
-AdditionalDecl: COMMA ID {;}
-              |AdditionalDecl AdditionalDecl {;}
+AdditionalDecl: COMMA ID  AdditionalDecl{;}
+              |/*vazio*/                {;}
             ;
 
 Type: BOOL {;}
@@ -53,37 +60,56 @@ Type: BOOL {;}
 
 MethodHeader: Type ID LPAR FormalParams RPAR {;}
             | VOID ID LPAR FormalParams RPAR {;}
+            | VOID ID LPAR RPAR {;}
+            | Type ID LPAR RPAR {;}
             ;
 
-FormalParams:Type ID {;}
-            |FormalParams COMMA Type ID {;}
+FormalParams:Type ID FormalParamsAux{;}
             |STRING LSQ RSQ ID {;}
             ;
 
-MethodBody: LBRACE Statement RBRACE {;}
+FormalParamsAux: COMMA Type ID FormalParamsAux{;}
+                |/*vazio*/ {;}
+                ;
+
+MethodBody: LBRACE MethodBodyAux RBRACE {;}
             ;
 
-VarDecl: Type ID SEMICOLON {;}
-        |Type ID AdditionalDecl SEMICOLON {;}
+MethodBodyAux: Statement MethodBodyAux {;}
+               |VarDecl MethodBodyAux  {;}
+               |/*vazio*/ {;}
+               ;
+
+VarDecl: Type ID AdditionalDecl SEMICOLON {;}
         ;
 
 Statement:LBRACE Statement RBRACE {;}
         |IF LPAR Expr RPAR Statement {;}
+        |IF LPAR Expr RPAR Statement ELSE Statement{;}
         |WHILE LPAR Expr RPAR Statement {;}
-        |RETURN Expr SEMICOLON {;}
-        |MethodInvocation SEMICOLON{;}
-        |Assignment SEMICOLON {;}
-        |ParseArgs SEMICOLON {;}
+        |RETURN StatementAux SEMICOLON {;}
+        |StatementAux1 SEMICOLON{;}
         |PRINT LPAR Expr RPAR SEMICOLON {;}
         |PRINT LPAR STRLIT RPAR SEMICOLON {;}
         ;
 
-AdditionalExpr: COMMA Expr {;}
-               |AdditionalExpr AdditionalExpr {;}
+StatementAux: Expr {;}
+              |/*vazio*/  {;}
+              ;
+
+StatementAux1: MethodInvocation {;}
+               |Assignment {;}
+               |ParseArgs {;}
+               |/*vazio*/ {;}
+               ;
+
+AdditionalExpr: COMMA Expr AdditionalExpr{;}
+               |/*vazio*/ {;}
                 ;
 
 MethodInvocation:ID LPAR Expr RPAR {;}
                 |ID LPAR Expr AdditionalExpr RPAR {;}
+                |ID LPAR RPAR{;}
                 ;
 
 Assignment: ID ASSIGN Expr {;}
@@ -92,42 +118,35 @@ Assignment: ID ASSIGN Expr {;}
 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR {;}
         ;
 
-ExprMath: Expr PLUS Expr   {;}
-    |     Expr MINUS Expr       {;}
-    |     Expr STAR Expr       {;}
-    |     Expr DIV Expr       {;}
-    |     Expr MOD Expr       {;}
-    ;
-
-ExprLogic:Expr AND Expr     {;}
-        |Expr OR Expr       {;}
-        |Expr XOR Expr      {;}
-        |Expr LSHIFT Expr   {;}
-        |Expr RSHIFT Expr   {;}
-        ;
-
-ExprCompare:Expr EQ Expr    {;}
-           |Expr GE Expr    {;}
-           |Expr GT Expr    {;}
-           |Expr LE Expr    {;}
-           |Expr LT Expr    {;}
-           |Expr NE Expr    {;}
-           ;
-
-Signal: MINUS {;}
-      | NOT {;}
-      | PLUS {;}
+Signal: MINUS Expr %prec UNARY{;}
+      | NOT Expr %prec UNARY{;}
+      | PLUS Expr %prec UNARY{;}
+      | UNARY Expr %prec UNARY{;}
       ;
 
-Expr: ExprMath {;}
-    | ExprLogic {;}
-    | ExprCompare {;}
+Expr: Expr PLUS Expr  {;}
+    | Expr MINUS Expr {;}
+    | Expr STAR Expr  {;}
+    | Expr DIV Expr   {;}
+    | Expr MOD Expr   {;}
+    | Expr EQ Expr    {;}
+    | Expr GE Expr    {;}
+    | Expr GT Expr    {;}
+    | Expr LE Expr    {;}
+    | Expr LT Expr    {;}
+    | Expr NE Expr    {;}
     | LPAR Expr RPAR {;}
-    | Signal Expr {;}
+    | Expr AND Expr     {;}
+    | Expr OR Expr       {;}
+    | Expr XOR Expr      {;}
+    | Expr LSHIFT Expr   {;}
+    | Expr RSHIFT Expr   {;}
     | MethodInvocation {;}
     | Assignment {;}
+    | Signal  {;}
     | ParseArgs {;}
     | ID DOTLENGHT {;}
+    | ID {;}
     | INTLIT {;}
     | REALLIT {;}
     | BOOLLIT {;}
