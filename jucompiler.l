@@ -56,8 +56,9 @@ UNARY                "++"|"--"
 <ML_COMMENT><<EOF>>             {printf("Line %d, col %d: unterminated comment\n", l_actual, c_actual); return 0;}
 <ML_COMMENT>{FINISHCOMMENT}     {COLUNA;BEGIN 0;}
 
-{RESERVED}       {if(flag==-1)printf("RESERVED(%s)\n", yytext);COLUNA;if(flagAux==1){return RESERVED;}}
-"false"          {if(flag==-1)printf("BOOLLIT(false)\n");COLUNA;if(flagAux==1){return BOOLLIT;}}
+{RESERVED}        {if(flag==-1)printf("RESERVED(%s)\n", yytext);COLUNA;if(flagAux==1){return RESERVED;}}
+{UNARY}           {if(flag==-1)printf("RESERVED(%s)\n", yytext); COLUNA;if(flagAux==1){return UNARY;}}
+"false"           {if(flag==-1)printf("BOOLLIT(false)\n");COLUNA;if(flagAux==1){return BOOLLIT;}}
 "true"            {if(flag==-1)printf("BOOLLIT(true)\n");COLUNA;if(flagAux==1){return BOOLLIT;}}
 "&&"              {if(flag==-1)printf("AND\n");COLUNA; if(flagAux==1){return AND;}}
 "="               {if(flag==-1)printf("ASSIGN\n");COLUNA;if(flagAux==1){return ASSIGN;}}
