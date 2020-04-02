@@ -106,7 +106,7 @@ UNARY                "++"|"--"
 {QUOTE}												{BEGIN STRINGLIT; strcat(save, yytext); l_actual= linha; c_actual= coluna;COLUNA; error=0;}
 <STRINGLIT>{STRLIT}									{COLUNA; strcat(save, yytext);}
 <STRINGLIT>\\(.?)									{printf("Line %d, col %d: invalid escape sequence (%s)\n", linha, coluna, yytext);COLUNA;error=1;}
-<STRINGLIT>{QUOTE}									{BEGIN 0; strcat(save, yytext); if(error==0){if(flag==-1)printf("STRLIT(%s)\n",save);} COLUNA;if(flagAux==1){yytext=strdup(save);return STRLIT;};save[0]=0;}
+<STRINGLIT>{QUOTE}									{BEGIN 0; strcat(save, yytext); if(error==0){if(flag==-1)printf("STRLIT(%s)\n",save);} COLUNA;if(flagAux==1 && error == 0){yytext=strdup(save);save[0]=0;return STRLIT;};save[0]=0;}
 <STRINGLIT><<EOF>>									{BEGIN 0; save[0]=0;printf("Line %d, col %d: unterminated string literal\n", l_actual, c_actual);LINHA;}
 <STRINGLIT>{LINETERMINATOR}                                      {printf("Line %d, col %d: unterminated string literal\n", linha, c_actual);LINHA;BEGIN 0; save[0]=0;}
 

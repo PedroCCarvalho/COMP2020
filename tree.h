@@ -12,13 +12,16 @@ typedef struct no{
     node parent;
 
     char *info;
+    char *type;
 
     int nChildren;
 
 }no;
 
 
-node createNode(char* value);
+node createNode(char* type, char* value);
 void addNode(node parent, node nodeAdd);
 void addBrother(node treeNode, node brother);
-
+int countSons(node root);
+int countBrothers(node root);
+void printTree(node root, int depth);

@@ -2,6 +2,7 @@
     #include <stdio.h>
     #include "y.tab.h"
     #include <string.h>
+    #include "tree.h"
     int yylex(void);
     void yyerror (const char *s);
     extern int coluna, linha;
@@ -17,7 +18,7 @@
 %token AND ASSIGN STAR DIV COMMA EQ GT GE LBRACE LE LPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RPAR RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGHT DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC STATIC STRING VOID WHILE RETURN
 %token <test> ID STRLIT REALLIT RESERVED INTLIT BOOLLIT
 
-%type <test> Program MethodDecl StatementAux1 StatementAuxRec FieldDecl StatementAux AdditionalExpr1 AdditionalDecl FormalParamsAux MethodBodyAux Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs Expr ExprAux ExprAux2 ExprCompare ExprLogic ExprMath ProgramAux 
+%type <string> Program MethodDecl StatementAux1 FieldDecl StatementAux AdditionalExpr1 AdditionalDecl FormalParamsAux MethodBodyAux Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs Expr ExprAux ExprAux2 ExprCompare ExprLogic ExprMath ProgramAux 
 
 %left COMMA
 %right ASSIGN
@@ -39,10 +40,10 @@
 Program: CLASS ID LBRACE ProgramAux RBRACE {;} 
         ;
 
-ProgramAux: MethodDecl ProgramAux{;}
-           |FieldDecl  ProgramAux{;}
-           |SEMICOLON  ProgramAux{;}
-           |/*gvazio*/     {;}
+ProgramAux: MethodDecl ProgramAux {;}
+           |FieldDecl  ProgramAux {;}
+           |SEMICOLON  ProgramAux {;}
+           |/*vazio*/     {;}
            ;
 
 MethodDecl: PUBLIC STATIC MethodHeader MethodBody {;}
@@ -87,13 +88,18 @@ VarDecl: Type ID AdditionalDecl SEMICOLON {;}
         ;
 
 Statement:LBRACE StatementAuxRec RBRACE {;}
-        |IF LPAR Expr RPAR Statement {;}
-        |IF LPAR Expr RPAR Statement ELSE Statement{;}
-        |WHILE LPAR Expr RPAR Statement {;}
+        |IF LPAR ExprAux RPAR Statement {;}
+        |IF LPAR ExprAux RPAR Statement ELSE Statement{;}
+        |WHILE LPAR ExprAux RPAR Statement {;}
         |RETURN StatementAux SEMICOLON {;}
         |StatementAux1 SEMICOLON{;}
-        |PRINT LPAR Expr RPAR SEMICOLON {;}
+        |PRINT LPAR PrintAux RPAR SEMICOLON {;}
         |error SEMICOLON {;}
+        ;
+
+PrintAux:STRLIT {;}
+        |ExprAux {;}
+        |/*vazio*/ {;}
         ;
 
 StatementAux: Expr {;}
@@ -126,7 +132,7 @@ MethodInvocation:ID LPAR AdditionalExpr RPAR {;}
 Assignment: ID ASSIGN Expr SEMICOLON {;}
             ;
 
-ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR {;}
+ParseArgs: PARSEINT LPAR ID LSQ ExprAux RSQ RPAR {;}
            |PARSEINT LPAR error RPAR {;}
         ;
 
@@ -154,10 +160,11 @@ ExprCompare:ExprAux EQ ExprAux    {;}
 
 Expr: Assignment {}
     |ExprAux {;}
+    
     ;
 
 ExprAux: ExprAux2 {;}
-    | ExprMath  {;}
+    |ExprMath  {;}
     | ExprCompare {;}
     | ExprLogic {;}
     | LPAR ExprAux RPAR  {;}
@@ -169,7 +176,6 @@ ExprAux: ExprAux2 {;}
     | INTLIT  {;}
     | REALLIT {;}
     | BOOLLIT {;}
-    | STRLIT {;}
     | LPAR error RPAR {;}
         ;
 
