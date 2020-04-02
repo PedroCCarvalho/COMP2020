@@ -44,7 +44,7 @@ UNARY                "++"|"--"
  
 %%
 
-"|"                             {if(flag==1){printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);};COLUNA;}
+"|"                             {printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);COLUNA;}
 
 {OLCOMMENT}                     {BEGIN OL_COMMENT;}
 <OL_COMMENT>{LINETERMINATOR}    {LINHA;BEGIN 0;}
@@ -53,12 +53,12 @@ UNARY                "++"|"--"
 {STARTCOMMENT}                  {c_actual = coluna; l_actual = linha;COLUNA;BEGIN(ML_COMMENT);}
 <ML_COMMENT>{LINETERMINATOR}    {LINHA;}
 <ML_COMMENT>.                   {COLUNA;}
-<ML_COMMENT><<EOF>>             {if(flag==1){printf("Line %d, col %d: unterminated comment\n", l_actual, c_actual);}; return 0;}
+<ML_COMMENT><<EOF>>             {printf("Line %d, col %d: unterminated comment\n", l_actual, c_actual); return 0;}
 <ML_COMMENT>{FINISHCOMMENT}     {COLUNA;BEGIN 0;}
 
-{RESERVED}        {if(flag==-1)printf("RESERVED(%s)\n", yytext);COLUNA;if(flagAux==1){return RESERVED;}}
-{UNARY}           {if(flag==-1)printf("RESERVED(%s)\n", yytext); COLUNA;if(flagAux==1){return UNARY;}}
-"false"           {if(flag==-1)printf("BOOLLIT(false)\n");COLUNA;if(flagAux==1){return BOOLLIT;}}
+
+{RESERVED}       {if(flag==-1)printf("RESERVED(%s)\n", yytext);COLUNA;if(flagAux==1){return RESERVED;}}
+"false"          {if(flag==-1)printf("BOOLLIT(false)\n");COLUNA;if(flagAux==1){return BOOLLIT;}}
 "true"            {if(flag==-1)printf("BOOLLIT(true)\n");COLUNA;if(flagAux==1){return BOOLLIT;}}
 "&&"              {if(flag==-1)printf("AND\n");COLUNA; if(flagAux==1){return AND;}}
 "="               {if(flag==-1)printf("ASSIGN\n");COLUNA;if(flagAux==1){return ASSIGN;}}
@@ -105,10 +105,10 @@ UNARY                "++"|"--"
 
 {QUOTE}												{BEGIN STRINGLIT; strcat(save, yytext); l_actual= linha; c_actual= coluna;COLUNA; error=0;}
 <STRINGLIT>{STRLIT}									{COLUNA; strcat(save, yytext);}
-<STRINGLIT>\\(.?)									{if(flag==1){printf("Line %d, col %d: invalid escape sequence (%s)\n", linha, coluna, yytext);};COLUNA;error=1;}
-<STRINGLIT>{QUOTE}									{BEGIN 0; strcat(save, yytext); if(error==0){if(flag==-1)printf("STRLIT(%s)\n",save);} COLUNA;save[0]=0;}
+<STRINGLIT>\\(.?)									{printf("Line %d, col %d: invalid escape sequence (%s)\n", linha, coluna, yytext);COLUNA;error=1;}
+<STRINGLIT>{QUOTE}									{BEGIN 0; strcat(save, yytext); if(error==0){if(flag==-1)printf("STRLIT(%s)\n",save);} COLUNA;save[0]=0;if(flagAux==1){return STRLIT;}}
 <STRINGLIT><<EOF>>									{BEGIN 0; save[0]=0;printf("Line %d, col %d: unterminated string literal\n", l_actual, c_actual);LINHA;}
-<STRINGLIT>{LINETERMINATOR}                                      {if(flag==1){printf("Line %d, col %d: unterminated string literal\n", linha, c_actual);};LINHA;BEGIN 0; save[0]=0;}
+<STRINGLIT>{LINETERMINATOR}                                      {{printf("Line %d, col %d: unterminated string literal\n", linha, c_actual);};LINHA;BEGIN 0; save[0]=0;}
 
 {WHITESPACE}           {COLUNA;}
 {LINETERMINATOR}       {LINHA;}
@@ -122,7 +122,7 @@ UNARY                "++"|"--"
 
 
 
-.                         {if(flag==1){printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);};COLUNA;}
+.                         {printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);COLUNA;}
 
 %%
 
