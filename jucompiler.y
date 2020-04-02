@@ -1,8 +1,11 @@
 %{
     #include <stdio.h>
     #include "y.tab.h"
+    #include <string.h>
     int yylex(void);
     void yyerror (const char *s);
+    extern int coluna, linha;
+    extern char* yytext;
 %}
 
 
@@ -123,10 +126,6 @@ ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR {;}
            |PARSEINT LPAR error RPAR {;}
         ;
 
-Expr1: Expr {}
-        |     | Assignment {;}
-        ;
-
 Expr: Expr PLUS Expr  {;}
     | Expr MINUS Expr {;}
     | Expr STAR Expr  {;}
@@ -138,13 +137,14 @@ Expr: Expr PLUS Expr  {;}
     | Expr LE Expr    {;}
     | Expr LT Expr    {;}
     | Expr NE Expr    {;}
-    | LPAR Expr1 RPAR  {;}
+    | LPAR Expr RPAR  {;}
     | Expr AND Expr   {;}
     | Expr OR Expr    {;}
     | Expr XOR Expr   {;}
     | Expr LSHIFT Expr   {;}
     | Expr RSHIFT Expr   {;}
     | MethodInvocation   {;}
+    | Assignment {}
     | MINUS Expr %prec UNARY{;}
     | NOT Expr %prec UNARY{;}
     | PLUS Expr %prec UNARY{;}
@@ -159,3 +159,7 @@ Expr: Expr PLUS Expr  {;}
 
 
 %%
+
+void yyerror (const char *s) { 
+     printf ("Line %d, col %d: %s: %s\n",linha,(int)(coluna-strlen(yytext)), s, yytext);
+}
