@@ -14,7 +14,7 @@
 %token AND ASSIGN STAR DIV COMMA EQ GT GE LBRACE LE LPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RPAR RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGHT DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC STATIC STRING VOID WHILE RETURN
 %token <test> ID STRLIT REALLIT RESERVED INTLIT BOOLLIT
 
-%type <test> Program MethodDecl StatementAux1 FieldDecl StatementAux AdditionalDecl FormalParamsAux MethodBodyAux Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs Expr Signal ProgramAux
+%type <test> Program MethodDecl StatementAux1 FieldDecl StatementAux AdditionalExpr1 AdditionalDecl FormalParamsAux MethodBodyAux Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs Expr ProgramAux
 
 %left COMMA
 %right ASSIGN
@@ -45,8 +45,8 @@ ProgramAux: MethodDecl ProgramAux{;}
 MethodDecl: PUBLIC STATIC MethodHeader MethodBody {;}
             ;
 
-FieldDecl: PUBLIC STATIC Type ID SEMICOLON {;}
-          |PUBLIC STATIC Type ID AdditionalDecl SEMICOLON {;}
+FieldDecl: PUBLIC STATIC Type ID AdditionalDecl SEMICOLON {;}
+          |error SEMICOLON {;}
           ;
 
 AdditionalDecl: COMMA ID  AdditionalDecl{;}
@@ -91,6 +91,7 @@ Statement:LBRACE Statement RBRACE {;}
         |StatementAux1 SEMICOLON{;}
         |PRINT LPAR Expr RPAR SEMICOLON {;}
         |PRINT LPAR STRLIT RPAR SEMICOLON {;}
+        |error SEMICOLON {;}
         ;
 
 StatementAux: Expr {;}
@@ -103,26 +104,28 @@ StatementAux1: MethodInvocation {;}
                |/*vazio*/ {;}
                ;
 
-AdditionalExpr: COMMA Expr AdditionalExpr{;}
+AdditionalExpr: Expr AdditionalExpr1{;}
                |/*vazio*/ {;}
-                ;
+        ;
 
-MethodInvocation:ID LPAR Expr RPAR {;}
-                |ID LPAR Expr AdditionalExpr RPAR {;}
-                |ID LPAR RPAR{;}
+AdditionalExpr1: COMMA Expr AdditionalExpr1{;}
+               |/*vazio*/ {;}
+        ;
+
+MethodInvocation:ID LPAR AdditionalExpr RPAR {;}
+                |ID LPAR error RPAR {;}
                 ;
 
 Assignment: ID ASSIGN Expr {;}
             ;
 
 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR {;}
+           |PARSEINT LPAR error RPAR {;}
         ;
 
-Signal: MINUS Expr %prec UNARY{;}
-      | NOT Expr %prec UNARY{;}
-      | PLUS Expr %prec UNARY{;}
-      | UNARY Expr %prec UNARY{;}
-      ;
+Expr1: Expr {}
+        |     | Assignment {;}
+        ;
 
 Expr: Expr PLUS Expr  {;}
     | Expr MINUS Expr {;}
@@ -135,21 +138,23 @@ Expr: Expr PLUS Expr  {;}
     | Expr LE Expr    {;}
     | Expr LT Expr    {;}
     | Expr NE Expr    {;}
-    | LPAR Expr RPAR {;}
-    | Expr AND Expr     {;}
-    | Expr OR Expr       {;}
-    | Expr XOR Expr      {;}
+    | LPAR Expr1 RPAR  {;}
+    | Expr AND Expr   {;}
+    | Expr OR Expr    {;}
+    | Expr XOR Expr   {;}
     | Expr LSHIFT Expr   {;}
     | Expr RSHIFT Expr   {;}
-    | MethodInvocation {;}
-    | Assignment {;}
-    | Signal  {;}
-    | ParseArgs {;}
-    | ID DOTLENGHT {;}
-    | ID {;}
-    | INTLIT {;}
+    | MethodInvocation   {;}
+    | MINUS Expr %prec UNARY{;}
+    | NOT Expr %prec UNARY{;}
+    | PLUS Expr %prec UNARY{;}
+    | ParseArgs  {;}
+    | ID DOTLENGHT    {;}
+    | ID      {;}
+    | INTLIT  {;}
     | REALLIT {;}
     | BOOLLIT {;}
+    | LPAR error RPAR {;}
     ;
 
 
