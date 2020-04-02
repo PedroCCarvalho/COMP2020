@@ -17,7 +17,7 @@
 %token AND ASSIGN STAR DIV COMMA EQ GT GE LBRACE LE LPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RPAR RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGHT DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC STATIC STRING VOID WHILE RETURN
 %token <test> ID STRLIT REALLIT RESERVED INTLIT BOOLLIT
 
-%type <test> Program MethodDecl StatementAux1 FieldDecl StatementAux AdditionalExpr1 AdditionalDecl FormalParamsAux MethodBodyAux Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs Expr ProgramAux
+%type <test> Program MethodDecl StatementAux1 FieldDecl StatementAux AdditionalExpr1 AdditionalDecl FormalParamsAux MethodBodyAux Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs Expr ExprAux ExprAux2 ExprCompare ExprLogic ExprMath ProgramAux 
 
 %left COMMA
 %right ASSIGN
@@ -112,42 +112,55 @@ AdditionalExpr: Expr AdditionalExpr1{;}
 
 AdditionalExpr1: COMMA Expr AdditionalExpr1{;}
                |/*vazio*/ {;}
+               
         ;
 
 MethodInvocation:ID LPAR AdditionalExpr RPAR {;}
                 |ID LPAR error RPAR {;}
                 ;
 
-Assignment: ID ASSIGN Expr {;}
+Assignment: ID ASSIGN Expr SEMICOLON {;}
             ;
 
 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR {;}
            |PARSEINT LPAR error RPAR {;}
         ;
 
-Expr: Expr PLUS Expr  {;}
-    | Expr MINUS Expr {;}
-    | Expr STAR Expr  {;}
-    | Expr DIV Expr   {;}
-    | Expr MOD Expr   {;}
-    | Expr EQ Expr    {;}
-    | Expr GE Expr    {;}
-    | Expr GT Expr    {;}
-    | Expr LE Expr    {;}
-    | Expr LT Expr    {;}
-    | Expr NE Expr    {;}
+ExprMath: ExprAux PLUS ExprAux   {;}
+    |     ExprAux MINUS ExprAux  {;}
+    |     ExprAux STAR ExprAux   {;}
+    |     ExprAux DIV ExprAux   {;}
+    |     ExprAux MOD ExprAux    {;}
+    ;
+
+ExprLogic:ExprAux AND ExprAux     {;}
+        |ExprAux OR ExprAux  {;}
+        |ExprAux XOR ExprAux      {;}
+        |ExprAux LSHIFT ExprAux {;}
+        |ExprAux RSHIFT ExprAux {;}
+        ;
+
+ExprCompare:ExprAux EQ ExprAux    {;}
+           |ExprAux GE ExprAux  {;}
+           |ExprAux GT ExprAux  {;}
+           |ExprAux LE ExprAux  {;}
+           |ExprAux LT ExprAux  {;}
+           |ExprAux NE ExprAux  {;}
+           ;
+
+Expr: Assignment {}
+    |ExprAux {;}
+    
+    ;
+
+ExprAux: ExprAux2 {;}
+    |ExprMath  {;}
+    | ExprCompare {;}
+    | ExprLogic {;}
     | LPAR Expr RPAR  {;}
-    | Expr AND Expr   {;}
-    | Expr OR Expr    {;}
-    | Expr XOR Expr   {;}
-    | Expr LSHIFT Expr   {;}
-    | Expr RSHIFT Expr   {;}
-    | MethodInvocation   {;}
-    | Assignment {}
     | MINUS Expr %prec UNARY{;}
     | NOT Expr %prec UNARY{;}
     | PLUS Expr %prec UNARY{;}
-    | ParseArgs  {;}
     | ID DOTLENGHT    {;}
     | ID      {;}
     | INTLIT  {;}
@@ -155,9 +168,11 @@ Expr: Expr PLUS Expr  {;}
     | BOOLLIT {;}
     | STRLIT {;}
     | LPAR error RPAR {;}
-    ;
+        ;
 
 
+ExprAux2: MethodInvocation   {;}
+        | ParseArgs  {;}
 %%
 
 void yyerror (const char *s) { 
