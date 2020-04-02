@@ -157,10 +157,10 @@ ExprAux: ExprAux2 {;}
     |ExprMath  {;}
     | ExprCompare {;}
     | ExprLogic {;}
-    | LPAR Expr RPAR  {;}
-    | MINUS Expr %prec UNARY{;}
-    | NOT Expr %prec UNARY{;}
-    | PLUS Expr %prec UNARY{;}
+    | LPAR ExprAux RPAR  {;}
+    | MINUS ExprAux %prec UNARY{;}
+    | NOT ExprAux %prec UNARY{;}
+    | PLUS ExprAux %prec UNARY{;}
     | ID DOTLENGHT    {;}
     | ID      {;}
     | INTLIT  {;}
