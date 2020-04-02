@@ -17,7 +17,7 @@
 %token AND ASSIGN STAR DIV COMMA EQ GT GE LBRACE LE LPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RPAR RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGHT DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC STATIC STRING VOID WHILE RETURN
 %token <test> ID STRLIT REALLIT RESERVED INTLIT BOOLLIT
 
-%type <test> Program MethodDecl StatementAux1 FieldDecl StatementAux AdditionalExpr1 AdditionalDecl FormalParamsAux MethodBodyAux Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs Expr ExprAux ExprAux2 ExprCompare ExprLogic ExprMath ProgramAux 
+%type <test> Program MethodDecl StatementAux1 StatementAuxRec FieldDecl StatementAux AdditionalExpr1 AdditionalDecl FormalParamsAux MethodBodyAux Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs Expr ExprAux ExprAux2 ExprCompare ExprLogic ExprMath ProgramAux 
 
 %left COMMA
 %right ASSIGN
@@ -86,7 +86,7 @@ MethodBodyAux: Statement MethodBodyAux {;}
 VarDecl: Type ID AdditionalDecl SEMICOLON {;}
         ;
 
-Statement:LBRACE Statement RBRACE {;}
+Statement:LBRACE StatementAuxRec RBRACE {;}
         |IF LPAR Expr RPAR Statement {;}
         |IF LPAR Expr RPAR Statement ELSE Statement{;}
         |WHILE LPAR Expr RPAR Statement {;}
@@ -105,6 +105,10 @@ StatementAux1: MethodInvocation {;}
                |ParseArgs {;}
                |/*vazio*/ {;}
                ;
+
+StatementAuxRec: Statement StatementAuxRec{;}
+                 |/*vazio*/  {;}
+                 ;
 
 AdditionalExpr: Expr AdditionalExpr1{;}
                |/*vazio*/ {;}
@@ -150,11 +154,10 @@ ExprCompare:ExprAux EQ ExprAux    {;}
 
 Expr: Assignment {}
     |ExprAux {;}
-    
     ;
 
 ExprAux: ExprAux2 {;}
-    |ExprMath  {;}
+    | ExprMath  {;}
     | ExprCompare {;}
     | ExprLogic {;}
     | LPAR ExprAux RPAR  {;}
