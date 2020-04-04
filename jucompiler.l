@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "tree.h"
 #include "y.tab.h"
 #define LINHA linha++; coluna=1;
 #define COLUNA coluna+=yyleng;
@@ -15,6 +16,8 @@ int c_actual=1;
 int l_actual=1;
 int error=0;
 char save[256];
+
+node root;
 
 %}
 
@@ -141,6 +144,12 @@ int main(int argc, char *argv[]){
         if(strcmp(argv[1],"-e2") == 0){
             flag = 1;
             flagAux=1;
+        }
+
+        if(strcmp(argv[1],"-t") == 0){
+            flag=1;
+            flagAux=1;
+   			printTree(root,0);
         }
     }
 
