@@ -12,19 +12,19 @@
     node aux;
     node aux2;
     node root;
-    
+
 %}
 
 
 %union{
- char* test;
+ char* string;
  struct no* node;
 }
 
 %token AND ASSIGN STAR DIV COMMA EQ GT GE LBRACE LE LPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RPAR RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGHT DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC STATIC STRING VOID WHILE RETURN
 %token <string> ID STRLIT REALLIT RESERVED INTLIT BOOLLIT
 
-%type <node> Program MethodDecl StatementAux1 FieldDecl StatementAux PrintAux StatementAuxRec AdditionalExpr1 AdditionalDecl FormalParamsAux MethodBodyAux Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs Expr ExprAux ExprAux2 ExprCompare ExprLogic ExprMath ProgramAux 
+%type <node> MethodHeader Program MethodDecl StatementAux1 StatementAuxRec PrintAux FieldDecl StatementAux AdditionalExpr1 AdditionalDecl FormalParamsAux MethodBodyAux Type FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs Expr ExprAux ExprAux2 ExprCompare ExprLogic ExprMath ProgramAux VOID 
 
 %left COMMA
 %right ASSIGN
@@ -62,7 +62,7 @@ FieldDecl: PUBLIC STATIC Type ID AdditionalDecl SEMICOLON {$$=createNode("FieldD
                                                                                                                                 node aux1 = createNode("FieldDecl", "");
                                                                                                                                 node aux2 = createNode("$3->type", $3->info);
                                                                                                                                 addNode(aux1, aux2);
-                                                                                                                                addBrother(aux2, createNode("Id", aux->value));
+                                                                                                                                addBrother(aux2, createNode("Id", aux->info));
                                                                                                                                 addBrother($$, aux1);
                                                                                                                                 aux = aux->brother;
                                                                                                                         }
@@ -81,14 +81,14 @@ Type: BOOL {$$ = createNode("Bool", "");}
     | DOUBLE {$$ = createNode("Double", "");}
     ;
 
-MethodHeader: Type ID LPAR FormalParams RPAR {$$ = createNode("MethodHeader"); addNode($$, $1); addBrother($1, createNode("Id", $2));
+MethodHeader: Type ID LPAR FormalParams RPAR {$$ = createNode("MethodHeader", ""); addNode($$, $1); addBrother($1, createNode("Id", $2));
                                                                                 aux = createNode("MethodParams", ""); addBrother($1, aux); addNode(aux, $4);
                                                 }                                                
-            | VOID ID LPAR FormalParams RPAR {$$ = createNode("MethodHeader"); $1= createNode("Void", ""); addNode($$,$1); addBrother($1,createNode("Id", $2));
+            | VOID ID LPAR FormalParams RPAR {$$ = createNode("MethodHeader", ""); $1= createNode("Void", ""); addNode($$,$1); addBrother($1,createNode("Id", $2));
                                                                                 aux = createNode("MethodParams", ""); addBrother($1, aux); addNode(aux,$4);
                                                 }
-            | VOID ID LPAR RPAR {$$ = createNode("MethodHeader"); $1= createNode("Void", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));}
-            | Type ID LPAR RPAR {$$ = createNode("MethodHeader"); addNode($$,$1); addBrother($1, createNode("Id", $2));}
+            | VOID ID LPAR RPAR {$$ = createNode("MethodHeader", ""); $1= createNode("Void", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));}
+            | Type ID LPAR RPAR {$$ = createNode("MethodHeader", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));}
             ;
 
 FormalParams:Type ID FormalParamsAux{$$= createNode("ParamDecl", ""); addNode($$,$1); aux = createNode("Id", $2);
@@ -100,7 +100,7 @@ FormalParams:Type ID FormalParamsAux{$$= createNode("ParamDecl", ""); addNode($$
             }
             ;
 
-FormalParamsAux: COMMA Type ID FormalParamsAux{$$ = createNode("ParamDecl"); aux = createNode("Id", $3);
+FormalParamsAux: COMMA Type ID FormalParamsAux{$$ = createNode("ParamDecl", ""); aux = createNode("Id", $3);
                                                 addNode($$,$2); addBrother($2,aux); addBrother($$,$4);
                 }
                 |/*vazio*/ {$$ = NULL;}
@@ -119,9 +119,9 @@ VarDecl: Type ID AdditionalDecl SEMICOLON {$$ = createNode("VarDecl", ""); addNo
                                                                                 aux = $3;
                                                                                 while(aux!= NULL){
                                                                                         node aux1 = createNode("VarDecl", "");
-                                                                                        node aux2 = createNode($1->type, $1->value);
+                                                                                        node aux2 = createNode($1->type, $1->info);
                                                                                         addNode(aux1,aux2);
-                                                                                        addBrother(aux2, createNode("Id", aux->value));
+                                                                                        addBrother(aux2, createNode("Id", aux->info));
                                                                                         addBrother($$,aux1);
                                                                                         aux= aux->brother;
                                                                                 }
@@ -144,7 +144,7 @@ Statement:LBRACE StatementAuxRec RBRACE {if(countBrothers($2)>1){aux = createNod
 								}else{
 									addBrother($3,aux);
 									addNode(aux,$5);
-									addBrother(aux,create("Block",""));
+									addBrother(aux,createNode("Block",""));
 								}
                                 }
         |IF LPAR Expr RPAR Statement ELSE Statement{$$=createNode("If",""); addNode($$,$3); 
@@ -185,7 +185,7 @@ Statement:LBRACE StatementAuxRec RBRACE {if(countBrothers($2)>1){aux = createNod
         |error SEMICOLON {$$=NULL;}
         ;
 
-PrintAux:STRLIT {$$=create("Strlit",$1);}
+PrintAux:STRLIT {$$=createNode("Strlit",$1);}
         |ExprAux {$$ = $1;}
         |/*vazio*/ {$$ = NULL;}
         ;
@@ -200,7 +200,7 @@ StatementAux1: MethodInvocation {$$ = $1;}
                |/*vazio*/ {$$ = NULL;}
                ;
 
-StatementAuxRec: Statement StatementAuxRec{if($1!=NULL){$$=$1; addbro($$,$2);}else{$$=$2;}}
+StatementAuxRec: Statement StatementAuxRec{if($1!=NULL){$$=$1; addBrother($$,$2);}else{$$=$2;}}
                  |/*vazio*/  {$$ = NULL;}
                  ;
 
@@ -213,11 +213,11 @@ AdditionalExpr1: COMMA Expr AdditionalExpr1{if($2!=NULL){$$=$2;addBrother($$,$3)
                
         ;
 
-MethodInvocation:ID LPAR AdditionalExpr RPAR {$$=create("Call","");aux= createNode("Id",$1); addNode($$,aux); addBrother(aux,$3);}
+MethodInvocation:ID LPAR AdditionalExpr RPAR {$$=createNode("Call","");aux= createNode("Id",$1); addNode($$,aux); addBrother(aux,$3);}
                 |ID LPAR error RPAR {$$= NULL;}
                 ;
 
-Assignment: ID ASSIGN Expr SEMICOLON {$$=createNode("Assign",""); aux = createNode(id_node,$1,"Id");addNode($$,aux); addBrother(aux,$3);}
+Assignment: ID ASSIGN Expr SEMICOLON {$$=createNode("Assign",""); aux = createNode("Id",$1);addNode($$,aux); addBrother(aux,$3);}
             ;
 
 ParseArgs: PARSEINT LPAR ID LSQ ExprAux RSQ RPAR {$$=createNode("ParseArgs",""); aux=createNode("Id",$3); addNode($$,aux); addBrother(aux,$5);}
