@@ -18,13 +18,13 @@
 
 %union{
  char* test;
- struct node* node;
+ struct no* node;
 }
 
 %token AND ASSIGN STAR DIV COMMA EQ GT GE LBRACE LE LPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RPAR RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGHT DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC STATIC STRING VOID WHILE RETURN
 %token <string> ID STRLIT REALLIT RESERVED INTLIT BOOLLIT
 
-%type <node> Program MethodDecl StatementAux1 FieldDecl StatementAux AdditionalExpr1 AdditionalDecl FormalParamsAux MethodBodyAux Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs Expr ExprAux ExprAux2 ExprCompare ExprLogic ExprMath ProgramAux 
+%type <node> Program MethodDecl StatementAux1 FieldDecl StatementAux PrintAux StatementAuxRec AdditionalExpr1 AdditionalDecl FormalParamsAux MethodBodyAux Type MethodHeader FormalParams MethodBody VarDecl Statement AdditionalExpr MethodInvocation Assignment ParseArgs Expr ExprAux ExprAux2 ExprCompare ExprLogic ExprMath ProgramAux 
 
 %left COMMA
 %right ASSIGN
@@ -191,7 +191,7 @@ PrintAux:STRLIT {$$=create("Strlit",$1);}
         ;
 
 StatementAux: Expr {$$ = $1;}
-              |/*vazio*/  {$$ = $1;}
+              |/*vazio*/  {$$ = NULL;}
               ;
 
 StatementAux1: MethodInvocation {$$ = $1;}
