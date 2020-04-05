@@ -16,6 +16,7 @@ int c_actual=1;
 int l_actual=1;
 int error=0;
 char save[256];
+int printError = 0;
 
 node root;
 
@@ -59,10 +60,10 @@ UNARY                "++"|"--"
 <ML_COMMENT><<EOF>>             {printf("Line %d, col %d: unterminated comment\n", l_actual, c_actual); return 0;}
 <ML_COMMENT>{FINISHCOMMENT}     {COLUNA;BEGIN 0;}
 
-{RESERVED}        {if(flag==-1)printf("RESERVED(%s)\n", yytext);COLUNA;if(flagAux==1){return RESERVED;}}
+{RESERVED}        {if(flag==-1)printf("RESERVED(%s)\n", yytext);COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return RESERVED;}}
 {UNARY}           {if(flag==-1)printf("RESERVED(%s)\n", yytext); COLUNA;if(flagAux==1){return UNARY;}}
-"false"           {if(flag==-1)printf("BOOLLIT(false)\n");COLUNA;if(flagAux==1){return BOOLLIT;}}
-"true"            {if(flag==-1)printf("BOOLLIT(true)\n");COLUNA;if(flagAux==1){return BOOLLIT;}}
+"false"           {if(flag==-1)printf("BOOLLIT(false)\n");COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return BOOLLIT;}}
+"true"            {if(flag==-1)printf("BOOLLIT(true)\n");COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return BOOLLIT;}}
 "&&"              {if(flag==-1)printf("AND\n");COLUNA; if(flagAux==1){return AND;}}
 "="               {if(flag==-1)printf("ASSIGN\n");COLUNA;if(flagAux==1){return ASSIGN;}}
 "*"               {if(flag==-1)printf("STAR\n");COLUNA;if(flagAux==1){return STAR;}}
@@ -109,19 +110,19 @@ UNARY                "++"|"--"
 {QUOTE}												{BEGIN STRINGLIT; strcat(save, yytext); l_actual= linha; c_actual= coluna;COLUNA; error=0;}
 <STRINGLIT>{STRLIT}									{COLUNA; strcat(save, yytext);}
 <STRINGLIT>\\(.?)									{printf("Line %d, col %d: invalid escape sequence (%s)\n", linha, coluna, yytext);COLUNA;error=1;}
-<STRINGLIT>{QUOTE}									{BEGIN 0; strcat(save, yytext); if(error==0){if(flag==-1)printf("STRLIT(%s)\n",save);} COLUNA;if(flagAux==1 && error == 0){yytext=strdup(save);save[0]=0;return STRLIT;};save[0]=0;}
+<STRINGLIT>{QUOTE}									{BEGIN 0; strcat(save, yytext); if(error==0){if(flag==-1)printf("STRLIT(%s)\n",save);} COLUNA;if(flagAux==1 && error == 0){yytext=strdup(save);yylval.string = (char*)strdup(yytext);save[0]=0;return STRLIT;};save[0]=0;}
 <STRINGLIT><<EOF>>									{BEGIN 0; save[0]=0;printf("Line %d, col %d: unterminated string literal\n", l_actual, c_actual);LINHA;}
 <STRINGLIT>{LINETERMINATOR}                                      {printf("Line %d, col %d: unterminated string literal\n", linha, c_actual);LINHA;BEGIN 0; save[0]=0;}
 
 {WHITESPACE}           {COLUNA;}
 {LINETERMINATOR}       {LINHA;}
-"0"             {if(flag==-1)printf("INTLIT(0)\n");COLUNA;if(flagAux==1){return INTLIT;}}
-{numNoZero}{numero} {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;if(flagAux==1){return INTLIT;}}
+"0"             {if(flag==-1)printf("INTLIT(0)\n");COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return INTLIT;}}
+{numNoZero}{numero} {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return INTLIT;}}
 ((({UNDERSCORE}?{numero}+)+({REALS})?({UNDERSCORE}?{numero}+)*)|(({UNDERSCORE}?{numero}+)*({REALS})?({UNDERSCORE}?{numero}+)+)){EXPOENT}{SIGNAL}?({UNDERSCORE}?{numero}+)+     {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flagAux==1){return REALLIT;}}
-({UNDERSCORE}?{numero}+)*{REALS}({UNDERSCORE}?{numero}+)+      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flagAux==1){return REALLIT;}}
-({UNDERSCORE}?{numero}+)+{REALS}({UNDERSCORE}?{numero}+)*      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flagAux==1){return REALLIT;}}
-{numNoZero}({UNDERSCORE}{numero}+)*     {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;if(flagAux==1){return INTLIT;}}
-{ID}{IDP}                 {if(flag==-1)printf("ID(%s)\n", yytext);COLUNA;if(flagAux==1){return ID;}}
+({UNDERSCORE}?{numero}+)*{REALS}({UNDERSCORE}?{numero}+)+      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return REALLIT;}}
+({UNDERSCORE}?{numero}+)+{REALS}({UNDERSCORE}?{numero}+)*      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return REALLIT;}}
+{numNoZero}({UNDERSCORE}{numero}+)*     {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return INTLIT;}}
+{ID}{IDP}                 {if(flag==-1)printf("ID(%s)\n", yytext);COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return ID;}}
 
 
 
@@ -149,7 +150,6 @@ int main(int argc, char *argv[]){
         if(strcmp(argv[1],"-t") == 0){
             flag=1;
             flagAux=1;
-   			printTree(root,0);
         }
     }
 
@@ -159,7 +159,11 @@ int main(int argc, char *argv[]){
         yylex();
     }else{
         yyparse();
+        yylex_destroy();
+    	printTree(root,0);
+        
     }
+
     return 0;
 }
 

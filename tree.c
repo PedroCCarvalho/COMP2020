@@ -1,18 +1,35 @@
 #include "tree.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
 
 
 node createNode(char* type, char* value){
 
-    node newNode = malloc(sizeof(node));
+    if(value == NULL){
+        strcpy(value, "");
+    }
+
+    if(type == NULL){
+        strcpy(type, "");
+    }
+
+    node newNode = malloc(sizeof(no));
+   
+    newNode->info = (char*)malloc(1+strlen(value)*sizeof(char));
+    strcpy(newNode->info, value);
+    
 
     newNode->type = (char*)malloc(1+strlen(type)*sizeof(char));
     strcpy(newNode->type, type);
-    newNode->info = (char*)malloc(1+strlen(value)*sizeof(char));
-    strcpy(newNode->info, value);
+
+    
 
     newNode->parent = NULL;
     newNode->child = NULL;
     newNode->brother = NULL;
+    newNode->nChildren = 0;
 
     return newNode;
 }
@@ -29,6 +46,7 @@ void addNode(node parent, node nodeAdd){
 }
 
 void addBrother(node treeNode, node brother){
+
     if((treeNode == NULL) || (brother == NULL) ){
         return;
     }
@@ -49,7 +67,6 @@ void addBrother(node treeNode, node brother){
         treeNode->parent->nChildren += 1;
     
     }
-
 }
 
 int countSons(node root){
@@ -86,7 +103,8 @@ void printTree(node root, int depth){
 
     int i = 0;
     node aux;
-    if(strcmp(root->type, "root") == 0){
+
+    if(strcmp(root->type, "Program") == 0){
         printf("%s\n", root->type);
     }
     else{
@@ -106,11 +124,11 @@ void printTree(node root, int depth){
         node freeN = aux;
         printTree(aux, depth+1);
         aux = aux->brother;
-
+        
         free(freeN->info);
         free(freeN->type);
         free(freeN);
-
+        
     }
 
 }

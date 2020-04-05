@@ -11,8 +11,8 @@ typedef struct no{
     node child;
     node parent;
 
-    char *info;
-    char *type;
+    char* info;
+    char* type;
 
     int nChildren;
 
