@@ -17,6 +17,7 @@ int l_actual=1;
 int error=0;
 char save[256];
 int printError = 0;
+int printTreeFlag = 0;
 
 node root;
 
@@ -150,6 +151,7 @@ int main(int argc, char *argv[]){
         if(strcmp(argv[1],"-t") == 0){
             flag=1;
             flagAux=1;
+            printTreeFlag = 1;
         }
     }
 
@@ -160,8 +162,9 @@ int main(int argc, char *argv[]){
     }else{
         yyparse();
         yylex_destroy();
-    	printTree(root,0);
-        
+        if(printTreeFlag == 1){
+    	    printTree(root,0);
+        }
     }
 
     return 0;
