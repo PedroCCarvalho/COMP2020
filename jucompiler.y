@@ -125,7 +125,6 @@ AdditionalExpr1: COMMA Expr AdditionalExpr1{;}
         ;
 
 MethodInvocation:ID LPAR AdditionalExpr  RPAR {;}
-                |ID LPAR LPAR Expr Assignment RPAR{;}
                 |ID LPAR error RPAR {;}
                 ;
 
