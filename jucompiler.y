@@ -120,18 +120,19 @@ AdditionalExpr: Expr AdditionalExpr1{;}
         ;
 
 AdditionalExpr1: COMMA Expr AdditionalExpr1{;}
-               |/*vazio*/ {;}
+                |/*vazio*/ {;}
                
         ;
 
-MethodInvocation:ID LPAR AdditionalExpr RPAR {;}
+MethodInvocation:ID LPAR AdditionalExpr  RPAR {;}
+                |ID LPAR LPAR Expr Assignment RPAR{;}
                 |ID LPAR error RPAR {;}
                 ;
 
 Assignment: ID ASSIGN Expr {;}
             ;
 
-ParseArgs: PARSEINT LPAR ID LSQ ExprAux RSQ RPAR {;}
+ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR {;}
            |PARSEINT LPAR error RPAR {;}
         ;
 
@@ -165,7 +166,7 @@ ExprAux: ExprAux2 {;}
     | ExprMath  {;}
     | ExprCompare {;}
     | ExprLogic {;}
-    | LPAR ExprAux RPAR  {;}
+    | LPAR Expr RPAR  {;}
     | MINUS ExprAux %prec UNARY{;}
     | NOT ExprAux %prec UNARY{;}
     | PLUS ExprAux %prec UNARY{;}
