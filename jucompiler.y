@@ -34,11 +34,13 @@
 %left OR
 %left AND
 %left XOR
-%left EQ NE LE GT LT GE
+%left EQ NE
+%left LE GT LT GE
 %left RSHIFT LSHIFT
 %left PLUS MINUS
 %left STAR DIV MOD
 %left UNARY
+%left ARROW
 %left LPAR LSQ RPAR RSQ
 %nonassoc ELSE
 %nonassoc IF
@@ -63,7 +65,7 @@ FieldDecl: PUBLIC STATIC Type ID AdditionalDecl SEMICOLON {$$=createNode("FieldD
                                                                                                                         aux=$5;
                                                                                                                         while(aux!=NULL){
                                                                                                                                 node aux1 = createNode("FieldDecl", "");
-                                                                                                                                node aux2 = createNode("$3->type", $3->info);
+                                                                                                                                node aux2 = createNode($3->type, $3->info);
                                                                                                                                 addNode(aux1, aux2);
                                                                                                                                 addBrother(aux2, createNode("Id", aux->info));
                                                                                                                                 addBrother($$, aux1);
