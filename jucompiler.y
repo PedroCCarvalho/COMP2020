@@ -188,7 +188,7 @@ Statement:LBRACE StatementAuxRec RBRACE {if(countBrothers($2)>1){aux = createNod
         |error SEMICOLON {$$=NULL; printError =1;}
         ;
 
-PrintAux:STRLIT {$$=createNode("Strlit",$1);}
+PrintAux:STRLIT {$$=createNode("StrLit",$1);}
         |ExprAux {$$ = $1;}
         |/*vazio*/ {$$ = NULL;}
         ;
@@ -262,11 +262,11 @@ ExprAux: ExprAux2 {$$ = $1;}
     | MINUS ExprAux %prec UNARY{$$=createNode("Minus","");addNode($$,$2);}
     | NOT ExprAux %prec UNARY{$$=createNode("Not","");addNode($$,$2);}
     | PLUS ExprAux %prec UNARY{$$=createNode("Plus","");addNode($$,$2);}
-    | ID DOTLENGHT    {$$=createNode("Lenght","");addNode($$,createNode("Id",$1));}
+    | ID DOTLENGHT    {$$=createNode("Length","");addNode($$,createNode("Id",$1));}
     | ID      {$$=createNode("Id",$1);}
-    | INTLIT  {$$=createNode("Intlit", $1);}
-    | REALLIT {$$=createNode("Reallit", $1);}
-    | BOOLLIT {$$=createNode("Boollit", $1);}
+    | INTLIT  {$$=createNode("DecLit", $1);}
+    | REALLIT {$$=createNode("RealLit", $1);}
+    | BOOLLIT {$$=createNode("BoolLit", $1);}
     | LPAR error RPAR {$$ = NULL; printError = 1;}
         ;
 

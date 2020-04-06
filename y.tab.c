@@ -1772,7 +1772,7 @@ yyreduce:
 
   case 36:
 #line 191 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.node)=createNode("Strlit",(yyvsp[0].string));}
+    {(yyval.node)=createNode("StrLit",(yyvsp[0].string));}
 #line 1777 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -2048,7 +2048,7 @@ yyreduce:
 
   case 82:
 #line 265 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.node)=createNode("Lenght","");addNode((yyval.node),createNode("Id",(yyvsp[-1].string)));}
+    {(yyval.node)=createNode("Length","");addNode((yyval.node),createNode("Id",(yyvsp[-1].string)));}
 #line 2053 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -2060,19 +2060,19 @@ yyreduce:
 
   case 84:
 #line 267 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.node)=createNode("Intlit", (yyvsp[0].string));}
+    {(yyval.node)=createNode("DecLit", (yyvsp[0].string));}
 #line 2065 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 85:
 #line 268 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.node)=createNode("Reallit", (yyvsp[0].string));}
+    {(yyval.node)=createNode("RealLit", (yyvsp[0].string));}
 #line 2071 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 86:
 #line 269 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.node)=createNode("Boollit", (yyvsp[0].string));}
+    {(yyval.node)=createNode("BoolLit", (yyvsp[0].string));}
 #line 2077 "y.tab.c" /* yacc.c:1646  */
     break;
 
