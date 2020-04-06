@@ -189,8 +189,7 @@ Statement:LBRACE StatementAuxRec RBRACE {if(countBrothers($2)>1){aux = createNod
         ;
 
 PrintAux:STRLIT {$$=createNode("StrLit",$1);}
-        |ExprAux {$$ = $1;}
-        |/*vazio*/ {$$ = NULL;}
+        |Expr {$$ = $1;}
         ;
 
 StatementAux: Expr {$$ = $1;}

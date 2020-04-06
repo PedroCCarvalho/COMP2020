@@ -2512,7 +2512,7 @@ int main(int argc, char *argv[]){
     }else{
         yyparse();
         yylex_destroy();
-        if(printTreeFlag == 1){
+        if(printTreeFlag == 1 && printError == 0){
     	    printTree(root,0);
         }
     }
