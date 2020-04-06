@@ -90,8 +90,8 @@ MethodHeader: Type ID LPAR FormalParams RPAR {$$ = createNode("MethodHeader", ""
             | VOID ID LPAR FormalParams RPAR {$$ = createNode("MethodHeader", ""); $1= createNode("Void", ""); addNode($$,$1); addBrother($1,createNode("Id", $2));
                                                                                 aux = createNode("MethodParams", ""); addBrother($1, aux); addNode(aux,$4);
                                                 }
-            | VOID ID LPAR RPAR {$$ = createNode("MethodHeader", ""); $1= createNode("Void", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));}
-            | Type ID LPAR RPAR {$$ = createNode("MethodHeader", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));}
+            | VOID ID LPAR RPAR {$$ = createNode("MethodHeader", ""); $1= createNode("Void", ""); addNode($$,$1); addBrother($1, createNode("Id", $2)); aux = createNode("MethodParams", ""); addBrother($1, aux);}
+            | Type ID LPAR RPAR {$$ = createNode("MethodHeader", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));aux = createNode("MethodParams", ""); addBrother($1, aux);}
             ;
 
 FormalParams:Type ID FormalParamsAux{$$= createNode("ParamDecl", ""); addNode($$,$1); aux = createNode("Id", $2);
