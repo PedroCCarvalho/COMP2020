@@ -3,9 +3,10 @@
     #include "y.tab.h"
     #include <string.h>
     #include "tree.h"
+    #include "tabela.h"
     #include <stdlib.h>
     #include <stdarg.h>
-    #include "tabela.h"
+
 
 
     int yylex(void);
@@ -17,9 +18,10 @@
     node aux2;
     node root;
     noGlobal tabela;
-    method tempMethod;
-    var tempVar;
-
+    noGlobal atual;
+    symbol method;
+    symbol var;
+    
 
 %}
 
@@ -28,8 +30,6 @@
  char* string;
  struct no* node;
  struct tabelaGlb* noGlobal;
- struct noMethod* method:
- struct noVar* var;
 }
 
 %token AND ASSIGN STAR DIV COMMA EQ GT GE LBRACE LE LPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RPAR RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGHT DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC STATIC STRING VOID WHILE RETURN
@@ -54,7 +54,10 @@
 
 %%
 
-Program: CLASS ID LBRACE ProgramAux RBRACE { root = createNode("Program", ""); aux = createNode("Id", $2); addNode(root,aux);addBrother(aux,$4); $$ = root; } 
+Program: CLASS ID LBRACE ProgramAux RBRACE { root = createNode("Program", ""); aux = createNode("Id", $2); addNode(root,aux);addBrother(aux,$4); $$ = root;printf("Skrrt");
+                                                                                                                                                                        tabela=criaTabela($2);
+                                                                                                                                                                        atual=tabela;
+                                                                                                                                                              } 
         ;
 
 ProgramAux: MethodDecl ProgramAux{$$=$1; addBrother($$,$2);}
@@ -78,7 +81,7 @@ FieldDecl: PUBLIC STATIC Type ID AdditionalDecl SEMICOLON {$$=createNode("FieldD
                                                                                                                                 aux = aux->brother;
                                                                                                                         }
                                                                                                                         free(aux);
-                                                                                                                }
+                                                                                                                };
                                                         }
           |error SEMICOLON {$$=NULL; printError = 1;}
           ;
@@ -94,25 +97,44 @@ Type: BOOL {$$ = createNode("Bool", "");}
 
 MethodHeader: Type ID LPAR FormalParams RPAR {$$ = createNode("MethodHeader", ""); addNode($$, $1); addBrother($1, createNode("Id", $2));
                                                                                 aux = createNode("MethodParams", ""); addBrother($1, aux); addNode(aux, $4);
+                                                                                method=createMethod($2, $1->info);
+                                                                                atual=addSymbolToClass(atual, method);
+
                                                 }                                                
             | VOID ID LPAR FormalParams RPAR {$$ = createNode("MethodHeader", ""); $1= createNode("Void", ""); addNode($$,$1); addBrother($1,createNode("Id", $2));
                                                                                 aux = createNode("MethodParams", ""); addBrother($1, aux); addNode(aux,$4);
+                                                                                method=createMethod($2, "void");
+                                                                                atual=addSymbolToClass(atual, method);
                                                 }
-            | VOID ID LPAR RPAR {$$ = createNode("MethodHeader", ""); $1= createNode("Void", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));}
-            | Type ID LPAR RPAR {$$ = createNode("MethodHeader", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));}
+            | VOID ID LPAR RPAR {$$ = createNode("MethodHeader", ""); $1= createNode("Void", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));
+                                                                                method=createMethod($2, "void");
+                                                                                atual=addSymbolToClass(atual, method);
+                                                                                }
+            | Type ID LPAR RPAR {$$ = createNode("MethodHeader", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));
+                                                                                method=createMethod($2, $1->info);
+                                                                                atual=addSymbolToClass(atual, method);
+                                                                                }
             ;
 
 FormalParams:Type ID FormalParamsAux{$$= createNode("ParamDecl", ""); addNode($$,$1); aux = createNode("Id", $2);
                                                                     addBrother($1, aux);
                                                                     addBrother($$, $3);
+                                                                    var=createVar($2, $1->info, method);
+                                                                    var->isParams=1;
+                                                                    method = addSymbolToMethod(method, var);
                                                                 }
             |STRING LSQ RSQ ID {$$ = createNode("ParamDecl", ""); aux = createNode("StringArray", ""); addNode($$, aux);
                                                                 addBrother(aux, createNode("Id", $4));
+                                                                var=createVar($4, "String", method);
+                                                                var->isParams=1;
+                                                                method = addSymbolToMethod(method, var);
             }
             ;
 
 FormalParamsAux: COMMA Type ID FormalParamsAux{$$ = createNode("ParamDecl", ""); aux = createNode("Id", $3);
                                                 addNode($$,$2); addBrother($2,aux); addBrother($$,$4);
+                                                var=createVar($3, $2->info, method);
+                                                var->isParams=1;
                 }
                 |/*vazio*/ {$$ = NULL;}
                 ;
@@ -137,6 +159,12 @@ VarDecl: Type ID AdditionalDecl SEMICOLON {$$ = createNode("VarDecl", ""); addNo
                                                                                         aux= aux->brother;
                                                                                 }
                                                                                 free(aux);
+                                                                        };
+                                                                        var=createVar($2, $1->info, method);
+                                                                        if(method==NULL){
+                                                                                addSymbolToClass(atual, var);
+                                                                        }else{
+                                                                                addSymbolToMethod(method, var);
                                                                         }
                                         }
         ;
@@ -190,7 +218,7 @@ Statement:LBRACE StatementAuxRec RBRACE {if(countBrothers($2)>1){aux = createNod
 							addNode(aux,$5);
 						}
 					}
-        |RETURN StatementAux SEMICOLON {$$=createNode("Return","");addNode($$,$2);}
+        |RETURN StatementAux SEMICOLON {$$=createNode("Return","");addNode($$,$2);method = NULL;}
         |StatementAux1 SEMICOLON{$$ = $1;}
         |PRINT LPAR PrintAux RPAR SEMICOLON {$$=createNode("Print",""); addNode($$,$3);}
         |error SEMICOLON {$$=NULL; printError =1;}

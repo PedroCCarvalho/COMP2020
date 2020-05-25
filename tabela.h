@@ -1,6 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
+
+typedef struct noTab* symbol;
+typedef struct noTab{
+    char* nome;
+    char* tipo;
+    int isMethod;
+    int isParams;
+    symbol irmao;
+    symbol vars;
+    symbol method; 
+}noTab;
 
 typedef struct tabelaGlb* noGlobal;
 typedef struct tabelaGlb{
@@ -10,18 +22,13 @@ typedef struct tabelaGlb{
     noGlobal prev;
 }tabelaGlb;
 
-typedef struct noTab* symbol;
-typedef struct noTab{
-    char* nome;
-    char* tipo;
-    int isMethod;
-    int isParams;
-    noGlobal classe;
-    symbol irmao;
-    symbol vars;
-    symbol method; 
-}noTab;
 
+noGlobal criaTabela(char* nome);
+noGlobal addClass(char* nome, noGlobal prev);
+symbol createMethod(char* nome, char* tipo);
+symbol createVar(char* nome, char* tipo, symbol method);
+noGlobal addSymbolToClass(noGlobal pai, symbol filho);
+symbol addSymbolToMethod(symbol method, symbol var);
 
 
 
