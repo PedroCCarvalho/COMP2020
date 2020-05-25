@@ -5,29 +5,23 @@
 typedef struct tabelaGlb* noGlobal;
 typedef struct tabelaGlb{
     char* nome;
-    method methods;
-
+    symbol symbols;
     noGlobal next;
     noGlobal prev;
 }tabelaGlb;
 
-typedef struct noMethod* method;
-typedef struct noMethod{
+typedef struct noTab* symbol;
+typedef struct noTab{
     char* nome;
     char* tipo;
-    var filhos;
-    method nextMethod;
-    noGlobal pai; 
-}noTabela;
+    int isMethod;
+    int isParams;
+    noGlobal classe;
+    symbol irmao;
+    symbol vars;
+    symbol method; 
+}noTab;
 
-typedef struct noVar* var;
-typedef struct noVar{
-    char* nome;
-    char* tipo;
-    int param;
-    var nextFilho;
-    method pai;
-}noVar;
 
 
 
