@@ -5,6 +5,7 @@
     #include "tree.h"
     #include <stdlib.h>
     #include <stdarg.h>
+    #include "tabela.h"
 
 
     int yylex(void);
@@ -15,6 +16,9 @@
     node aux1;
     node aux2;
     node root;
+    noGlobal tabela;
+    nodeTabela temp;
+
 
 %}
 
@@ -22,6 +26,8 @@
 %union{
  char* string;
  struct no* node;
+ struct tabelaGlb* noGlobal;
+ struct noTabela* nodeTabela:
 }
 
 %token AND ASSIGN STAR DIV COMMA EQ GT GE LBRACE LE LPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RPAR RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGHT DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC STATIC STRING VOID WHILE RETURN
@@ -34,13 +40,11 @@
 %left OR
 %left AND
 %left XOR
-%left EQ NE
-%left LE GT LT GE
+%left EQ NE LE GT LT GE
 %left RSHIFT LSHIFT
 %left PLUS MINUS
 %left STAR DIV MOD
 %left UNARY
-%left ARROW
 %left LPAR LSQ RPAR RSQ
 %nonassoc ELSE
 %nonassoc IF
@@ -65,7 +69,7 @@ FieldDecl: PUBLIC STATIC Type ID AdditionalDecl SEMICOLON {$$=createNode("FieldD
                                                                                                                         aux=$5;
                                                                                                                         while(aux!=NULL){
                                                                                                                                 node aux1 = createNode("FieldDecl", "");
-                                                                                                                                node aux2 = createNode($3->type, $3->info);
+                                                                                                                                node aux2 = createNode("$3->type", $3->info);
                                                                                                                                 addNode(aux1, aux2);
                                                                                                                                 addBrother(aux2, createNode("Id", aux->info));
                                                                                                                                 addBrother($$, aux1);
@@ -92,8 +96,8 @@ MethodHeader: Type ID LPAR FormalParams RPAR {$$ = createNode("MethodHeader", ""
             | VOID ID LPAR FormalParams RPAR {$$ = createNode("MethodHeader", ""); $1= createNode("Void", ""); addNode($$,$1); addBrother($1,createNode("Id", $2));
                                                                                 aux = createNode("MethodParams", ""); addBrother($1, aux); addNode(aux,$4);
                                                 }
-            | VOID ID LPAR RPAR {$$ = createNode("MethodHeader", ""); $1= createNode("Void", ""); addNode($$,$1); addBrother($1, createNode("Id", $2)); aux = createNode("MethodParams", ""); addBrother($1, aux);}
-            | Type ID LPAR RPAR {$$ = createNode("MethodHeader", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));aux = createNode("MethodParams", ""); addBrother($1, aux);}
+            | VOID ID LPAR RPAR {$$ = createNode("MethodHeader", ""); $1= createNode("Void", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));}
+            | Type ID LPAR RPAR {$$ = createNode("MethodHeader", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));}
             ;
 
 FormalParams:Type ID FormalParamsAux{$$= createNode("ParamDecl", ""); addNode($$,$1); aux = createNode("Id", $2);

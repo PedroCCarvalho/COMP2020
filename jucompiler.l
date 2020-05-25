@@ -119,7 +119,7 @@ UNARY                "++"|"--"
 {LINETERMINATOR}       {LINHA;}
 "0"             {if(flag==-1)printf("INTLIT(0)\n");COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return INTLIT;}}
 {numNoZero}{numero} {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return INTLIT;}}
-((({UNDERSCORE}?{numero}+)+({REALS})?({UNDERSCORE}?{numero}+)*)|(({UNDERSCORE}?{numero}+)*({REALS})?({UNDERSCORE}?{numero}+)+)){EXPOENT}{SIGNAL}?({UNDERSCORE}?{numero}+)+     {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return REALLIT;}}
+((({UNDERSCORE}?{numero}+)+({REALS})?({UNDERSCORE}?{numero}+)*)|(({UNDERSCORE}?{numero}+)*({REALS})?({UNDERSCORE}?{numero}+)+)){EXPOENT}{SIGNAL}?({UNDERSCORE}?{numero}+)+     {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flagAux==1){return REALLIT;}}
 ({UNDERSCORE}?{numero}+)*{REALS}({UNDERSCORE}?{numero}+)+      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return REALLIT;}}
 ({UNDERSCORE}?{numero}+)+{REALS}({UNDERSCORE}?{numero}+)*      {if(flag==-1)printf("REALLIT(%s)\n", yytext);COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return REALLIT;}}
 {numNoZero}({UNDERSCORE}{numero}+)*     {if(flag==-1)printf("INTLIT(%s)\n", yytext);COLUNA;if(flagAux==1){yylval.string = (char*)strdup(yytext);return INTLIT;}}

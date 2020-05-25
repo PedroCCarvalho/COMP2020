@@ -1,4 +1,4 @@
-lex jucompiler.l
+lex jucompiler.ld
 yacc -d jucompiler.y
 cc -o jucompiler tree.c y.tab.c lex.yy.c
-./jucompiler -e2 < test_cases/blocks.java
+./jucompiler -t < test_cases/string_error2.java
