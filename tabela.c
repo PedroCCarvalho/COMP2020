@@ -5,26 +5,24 @@
 #include <stdarg.h>
 
 noGlobal criaTabela(char* nome){
-    tabela = (noGlobal)malloc(sizeof(noGlobal));
+    noGlobal tabela = (noGlobal)malloc(sizeof(noGlobal));
     tabela->nome = (char*)malloc(1+strlen(nome)*sizeof(char));
     strcpy(tabela->nome, nome);
-    tabela->first=NULL;
+    tabela->methods=NULL;
     tabela->next=NULL;
     tabela->prev=NULL;
     return tabela;
 }
 
 noGlobal addFirst(char* nome, noGlobal pai){
-    nodeTabela first = (nodeTabela)malloc(sizeof(nodeTabela));
+    method first = (method)malloc(sizeof(method));
     first->nome = (char*)malloc(1+strlen(nome)*sizeof(char));
     strcpy(first->nome, nome);
-    first->prev = pai;
-    first->filho = NULL;
-    first->method = 1;
-    first->nextTabela = NULL;
-    first->param = 0;
+    first->pai = pai;
+    first->filhos = NULL;
+    first->nextMethod = NULL;
     first->tipo = NULL;
-    pai->first = first;
+    pai->methods = first;
     return pai;
 }
 
