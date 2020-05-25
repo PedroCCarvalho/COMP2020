@@ -14,34 +14,24 @@ noGlobal criaTabela(char* nome){
     return tabela;
 }
 
-noGlobal addFirst(char* nome, noGlobal pai){
+method addFirst(char* tipo, noGlobal pai){
     method first = (method)malloc(sizeof(method));
-    first->nome = (char*)malloc(1+strlen(nome)*sizeof(char));
-    strcpy(first->nome, nome);
+    first->tipo = (char*)malloc(1+strlen(tipo)*sizeof(char));
+    strcpy(first->tipo, tipo);
     first->pai = pai;
     first->filhos = NULL;
     first->nextMethod = NULL;
     first->tipo = NULL;
     pai->methods = first;
-    return pai;
+    return first;
 }
 
-nodeTabela methodTable(nodeTabela pai, char* nome, int isMethod, int isParam){
-    nodeTabela no = (nodeTabela)malloc(sizeof(nodeTabela));
+method methodTable(method no, char* tipo){
     no->nome = (char*)malloc(1+strlen(nome)*sizeof(char));
     strcpy(no->nome, nome);
-    no->prev = pai;
     no->tipo = (char*)malloc(1+strlen(nome)*sizeof(char));
     strcpy(no->tipo, "void");
-    if(isMethod==1){
-        no->method=1;
-        no->param=0;
-    }else{
-        no->method=0;
-        if(isParam==1){
-            no->param=1;
-        }
-    }
+    
 }
 
 noGlobal returnPai(nodeTabela no, int tipo){

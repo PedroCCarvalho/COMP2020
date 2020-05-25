@@ -27,7 +27,7 @@ typedef struct noVar{
     int param;
     var nextFilho;
     method pai;
-}var;
+}noVar;
 
 
 

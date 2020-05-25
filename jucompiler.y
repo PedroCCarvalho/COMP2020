@@ -17,7 +17,8 @@
     node aux2;
     node root;
     noGlobal tabela;
-    nodeTabela temp;
+    method tempMethod;
+    var tempVar;
 
 
 %}
@@ -27,7 +28,8 @@
  char* string;
  struct no* node;
  struct tabelaGlb* noGlobal;
- struct noTabela* nodeTabela:
+ struct noMethod* method:
+ struct noVar* var;
 }
 
 %token AND ASSIGN STAR DIV COMMA EQ GT GE LBRACE LE LPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RPAR RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGHT DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC STATIC STRING VOID WHILE RETURN
