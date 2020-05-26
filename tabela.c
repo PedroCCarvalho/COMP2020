@@ -1,8 +1,8 @@
-#include "tabela.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include "tabela.h"
 
 noGlobal criaTabela(char* nome, noGlobal tabela){
     if(nome == NULL){
@@ -22,18 +22,18 @@ noGlobal initTabela(){
     return tabela;
 }
 
-/*noGlobal addClass(char* nome, noGlobal prev){
+noGlobal addClass(char* nome, noGlobal prev){
     if(prev == NULL){
         return NULL;
     }
     noGlobal classe = malloc(sizeof(tabelaGlb));
-    classe = criaTabela(nome);
+    classe = criaTabela(nome,classe);
     classe->prev=prev;
     classe->symbols=NULL;
     prev->next=classe;
     return classe;
 
-}*/
+}
 
 
 symbol createMethod(char* nome, char* tipo){
@@ -75,6 +75,8 @@ symbol createVar(char* nome, char* tipo){
     no->irmao=NULL;
     no->isMethod=0;
     no->isParams=0;
+
+    return no;
 }
 
 noGlobal addSymbolToClass(noGlobal pai, symbol filho){
@@ -117,6 +119,31 @@ symbol addSymbolToMethod(symbol method, symbol var){
     }else{
         method->vars=var;
     }
+
+    return method;
+}
+
+symbol addVarToMethod(symbol  method, symbol var){
+    if(method == NULL){
+        return NULL;
+    }
+    if(var == NULL){
+        return NULL;
+    }
+    symbol aux = malloc(sizeof(noTab));
+
+    aux= method->method;
+    if(aux!=NULL){
+        while(aux->irmao!=NULL){
+            aux=aux->irmao;
+        }
+        aux->irmao=var;
+        return method;
+    }else{
+        method->method=var;
+    }
+
+    return method;
 }
 
 
@@ -130,31 +157,33 @@ void printTabela(noGlobal no){
         printf("==== Class %s Symbol Table ====\n", aux->nome);
         symbolAux=aux->symbols;
         while(symbolAux != NULL){
-            //printf("boas");
             printf("%s\t",symbolAux->nome);
-            if(symbolAux->isMethod==1){
-                if(symbolAux->vars != NULL){
+            if(symbolAux->vars != NULL){
                     printf("(");
                     paramAux = symbolAux->vars;
                     while(paramAux != NULL){
-                        printf("%s",paramAux->nome);
-                        paramAux = paramAux->irmao;
+                        printf("%s ",paramAux->nome);
+                        paramAux = paramAux->irmao;    
                     }        
-                    printf(")");
-                }
-            }else{
-                printf("%s\t",symbolAux->nome);
+                    printf(")\t");
             }
-            printf("\t%s",symbolAux->tipo);
-            if(symbolAux->isParams==1){
-                printf("params\t");
-            }
-            printf("\n");
+            printf("%s\n",symbolAux->tipo);
             symbolAux=symbolAux->irmao;
+        }
+        symbolAux = aux->symbols;
+        while(symbolAux != NULL){
+            printf("==== Method %s Symbol Table ====\n", symbolAux->nome);
+            printf("return\t%s\n", symbolAux->tipo); 
+            paramAux = symbolAux->method;
+            while(paramAux != NULL){
+                printf("%s\t%s param\n",paramAux->nome, paramAux->tipo);
+                paramAux = paramAux->irmao;    
+            }        
+            symbolAux = symbolAux->irmao;
         }
         aux=aux->next;
     }
-}
+}    
 
 
 

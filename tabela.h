@@ -5,6 +5,7 @@
 
 typedef struct noTab* symbol;
 typedef struct noTab{
+
     char* nome;
     char* tipo;
     int isMethod;
@@ -12,14 +13,17 @@ typedef struct noTab{
     symbol irmao;
     symbol vars;
     symbol method; 
+
 }noTab;
 
 typedef struct tabelaGlb* noGlobal;
 typedef struct tabelaGlb{
+
     char* nome;
     symbol symbols;
     noGlobal next;
     noGlobal prev;
+
 }tabelaGlb;
 
 
@@ -28,10 +32,11 @@ noGlobal addClass(char* nome, noGlobal prev);
 symbol createMethod(char* nome, char* tipo);
 symbol createVar(char* nome, char* tipo);
 noGlobal addSymbolToClass(noGlobal pai, symbol filho);
+symbol addVarToMethod(symbol  method, symbol var);
 symbol addSymbolToMethod(symbol method, symbol var);
 void printTabela(noGlobal tabela);
 noGlobal initTabela();
-
+    
 
 
 
