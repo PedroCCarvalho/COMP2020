@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "tree.h"
+#include "tabela.h"
 #include "y.tab.h"
 #define LINHA linha++; coluna=1;
 #define COLUNA coluna+=yyleng;
@@ -20,6 +21,7 @@ int printError = 0;
 int printTreeFlag = 0;
 
 node root;
+noGlobal tabela;
 
 %}
 
@@ -46,7 +48,6 @@ FINISHCOMMENT        "*/"
 LINETERMINATOR       \n|\r|\r\n
 UNARY                "++"|"--"
 
- 
 %%
 
 "|"                             {printf("Line %d, col %d: illegal character (%s)\n", linha, coluna, yytext);COLUNA;}
@@ -164,6 +165,7 @@ int main(int argc, char *argv[]){
         yylex_destroy();
         if(printTreeFlag == 1 && printError == 0){
     	    printTree(root,0);
+            printTabela(tabela);
         }
     }
 

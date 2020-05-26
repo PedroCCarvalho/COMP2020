@@ -4,23 +4,25 @@
 #include <string.h>
 #include <stdarg.h>
 
-noGlobal criaTabela(char* nome){
-    printf("inicio");
+noGlobal criaTabela(char* nome, noGlobal tabela){
     if(nome == NULL){
         strcpy(nome,"");
     }
-    
-    noGlobal tabela = malloc(sizeof(tabelaGlb));
     tabela->nome = (char*)malloc(1+strlen(nome)*sizeof(char));
     strcpy(tabela->nome, nome);
-    tabela->symbols=NULL;
-    tabela->next=NULL;
-    tabela->prev=NULL;
-    printf("passou o primeiro");
     return tabela;
 }
 
-noGlobal addClass(char* nome, noGlobal prev){
+noGlobal initTabela(){
+    noGlobal tabela = malloc(sizeof(tabelaGlb));
+    tabela->nome = NULL;
+    tabela->symbols=NULL;
+    tabela->next=NULL;
+    tabela->prev=NULL;
+    return tabela;
+}
+
+/*noGlobal addClass(char* nome, noGlobal prev){
     if(prev == NULL){
         return NULL;
     }
@@ -31,7 +33,7 @@ noGlobal addClass(char* nome, noGlobal prev){
     prev->next=classe;
     return classe;
 
-}
+}*/
 
 
 symbol createMethod(char* nome, char* tipo){
@@ -77,12 +79,14 @@ symbol createVar(char* nome, char* tipo, symbol method){
 }
 
 noGlobal addSymbolToClass(noGlobal pai, symbol filho){
-    if(pai == NULL){
-        return NULL;
-    }
     if(filho == NULL){
         return NULL;
     }
+    if(pai == NULL){
+        return NULL;
+    }
+    
+    
     symbol aux = malloc(sizeof(noTab));
     if(pai->symbols!=NULL){
         while(aux->irmao!=NULL){
@@ -126,21 +130,27 @@ void printTabela(noGlobal no){
     symbol symbolAux, paramAux;
     while(aux != NULL){
         printf("==== Class %s Symbol Table ====\n", aux->nome);
+        symbolAux=aux->symbols;
         while(symbolAux != NULL){
- 
+            //printf("boas");
             printf("%s\t",symbolAux->nome);
- 
-            if(symbolAux->vars != NULL){
-                printf("(");
-                paramAux = symbolAux->vars;
-                while(paramAux != NULL){
-                    printf("%s",paramAux->nome);
-                    paramAux = paramAux->irmao;
-                }        
-                printf(")");
+            if(symbolAux->isMethod==1){
+                if(symbolAux->vars != NULL){
+                    printf("(");
+                    paramAux = symbolAux->vars;
+                    while(paramAux != NULL){
+                        printf("%s",paramAux->nome);
+                        paramAux = paramAux->irmao;
+                    }        
+                    printf(")");
+                }
+            }else{
+                printf("%s\t",symbolAux->nome);
             }
             printf("\t%s",symbolAux->tipo);
+            symbolAux=symbolAux->irmao;
         }
+        aux=aux->next;
     }
 }
 

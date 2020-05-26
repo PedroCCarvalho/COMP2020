@@ -23,12 +23,14 @@ typedef struct tabelaGlb{
 }tabelaGlb;
 
 
-noGlobal criaTabela(char* nome);
+noGlobal criaTabela(char* nome, noGlobal tabela);
 noGlobal addClass(char* nome, noGlobal prev);
 symbol createMethod(char* nome, char* tipo);
 symbol createVar(char* nome, char* tipo, symbol method);
 noGlobal addSymbolToClass(noGlobal pai, symbol filho);
 symbol addSymbolToMethod(symbol method, symbol var);
+void printTabela(noGlobal tabela);
+noGlobal initTabela();
 
 
 
