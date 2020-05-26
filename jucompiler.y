@@ -68,7 +68,8 @@ ProgramAux: MethodDecl ProgramAux{$$=$1; addBrother($$,$2);}
 MethodDecl: PUBLIC STATIC MethodHeader MethodBody {$$ = createNode("MethodDecl", ""); addNode($$,$3); addBrother($3,$4);
                                                                                                         if(tabela==NULL){
                                                                                                                 tabela=initTabela();
-                                                                                                        }
+                                                                                                                printf("skrrt");
+                                                                                                        };
                                                                                                         }
             ;
 
@@ -122,13 +123,13 @@ MethodHeader: Type ID LPAR FormalParams RPAR {$$ = createNode("MethodHeader", ""
 FormalParams:Type ID FormalParamsAux{$$= createNode("ParamDecl", ""); addNode($$,$1); aux = createNode("Id", $2);
                                                                     addBrother($1, aux);
                                                                     addBrother($$, $3);
-                                                                    var=createVar($2, $1->info, method);
+                                                                    var=createVar($2, $1->info);
                                                                     var->isParams=1;
                                                                     method = addSymbolToMethod(method, var);
                                                                 }
             |STRING LSQ RSQ ID {$$ = createNode("ParamDecl", ""); aux = createNode("StringArray", ""); addNode($$, aux);
                                                                 addBrother(aux, createNode("Id", $4));
-                                                                var=createVar($4, "String", method);
+                                                                var=createVar($4, "String");
                                                                 var->isParams=1;
                                                                 method = addSymbolToMethod(method, var);
             }
@@ -136,7 +137,7 @@ FormalParams:Type ID FormalParamsAux{$$= createNode("ParamDecl", ""); addNode($$
 
 FormalParamsAux: COMMA Type ID FormalParamsAux{$$ = createNode("ParamDecl", ""); aux = createNode("Id", $3);
                                                 addNode($$,$2); addBrother($2,aux); addBrother($$,$4);
-                                                var=createVar($3, $2->info, method);
+                                                var=createVar($3, $2->info);
                                                 var->isParams=1;
                 }
                 |/*vazio*/ {$$ = NULL;}
@@ -164,13 +165,15 @@ VarDecl: Type ID AdditionalDecl SEMICOLON {$$ = createNode("VarDecl", ""); addNo
                                                                                 free(aux);
                                                                         };
                                                                         if(tabela==NULL){
-                                                                                                                tabela=initTabela();
-                                                                                                        }
-                                                                        var=createVar($2, $1->type, method);                                                                        if(method==NULL){
+                                                                                tabela=initTabela();
+                                                                        };
+                                                                        var=createVar($2, $1->type);
+                                                                        
+                                                                        if(method==NULL){                                                                        if(method==NULL){
                                                                                 addSymbolToClass(tabela, var);
                                                                         }else{
                                                                                 addSymbolToMethod(method, var);
-                                                                        }
+                                                                        }}
                                         }
         ;
 

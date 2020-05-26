@@ -58,7 +58,7 @@ symbol createMethod(char* nome, char* tipo){
     return no;
 }
 
-symbol createVar(char* nome, char* tipo, symbol method){
+symbol createVar(char* nome, char* tipo){
     if(nome == NULL){
         strcpy(nome, "");
     }
@@ -75,7 +75,6 @@ symbol createVar(char* nome, char* tipo, symbol method){
     no->irmao=NULL;
     no->isMethod=0;
     no->isParams=0;
-    no->method=method;
 }
 
 noGlobal addSymbolToClass(noGlobal pai, symbol filho){
@@ -86,9 +85,8 @@ noGlobal addSymbolToClass(noGlobal pai, symbol filho){
         return NULL;
     }
     
-    
-    symbol aux = malloc(sizeof(noTab));
-    if(pai->symbols!=NULL){
+    symbol aux = pai->symbols;
+    if(aux!=NULL){
         while(aux->irmao!=NULL){
             aux=aux->irmao;
         }
@@ -107,9 +105,9 @@ symbol addSymbolToMethod(symbol method, symbol var){
     if(var == NULL){
         return NULL;
     }
-    symbol aux = 
-    malloc(sizeof(noTab));
+    symbol aux = malloc(sizeof(noTab));
     aux=method->vars;
+    var->method=method;
     if(aux!=NULL){
         while(aux->irmao!=NULL){
             aux=aux->irmao;
@@ -148,6 +146,10 @@ void printTabela(noGlobal no){
                 printf("%s\t",symbolAux->nome);
             }
             printf("\t%s",symbolAux->tipo);
+            if(symbolAux->isParams==1){
+                printf("params\t");
+            }
+            printf("\n");
             symbolAux=symbolAux->irmao;
         }
         aux=aux->next;
