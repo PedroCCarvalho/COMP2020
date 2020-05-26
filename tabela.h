@@ -36,7 +36,7 @@ symbol addVarToMethod(symbol  method, symbol var);
 symbol addSymbolToMethod(symbol method, symbol var);
 void printTabela(noGlobal tabela);
 noGlobal initTabela();
+symbol initMethod();
     
-
 
 

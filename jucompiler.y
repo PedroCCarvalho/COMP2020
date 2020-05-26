@@ -53,8 +53,10 @@
 
 %%
 
-Program: CLASS ID LBRACE ProgramAux RBRACE { root = createNode("Program", ""); aux = createNode("Id", $2); addNode(root,aux);addBrother(aux,$4); $$ = root;
+Program: CLASS ID LBRACE ProgramAux RBRACE {printf("skrrt\n"); root = createNode("Program", ""); aux = createNode("Id", $2); addNode(root,aux);addBrother(aux,$4); $$ = root;
                                                                                                                                                                 tabela=criaTabela($2, tabela);
+                                                                                                                                                                
+                                                                                                                                                                
                                                                                                                                                                 
                                                                                                                                                               } 
         ;
@@ -68,7 +70,10 @@ ProgramAux: MethodDecl ProgramAux{$$=$1; addBrother($$,$2);}
 MethodDecl: PUBLIC STATIC MethodHeader MethodBody {$$ = createNode("MethodDecl", ""); addNode($$,$3); addBrother($3,$4);
                                                                                                         if(tabela==NULL){
                                                                                                                 tabela=initTabela();
-                                                                                                                printf("skrrt");
+                                                                                                                
+                                                                                                                
+                                                                                                        }else{
+                                                                                                                method=initMethod();
                                                                                                         };
                                                                                                         }
             ;
@@ -86,6 +91,13 @@ FieldDecl: PUBLIC STATIC Type ID AdditionalDecl SEMICOLON {$$=createNode("FieldD
                                                                                                                         }
                                                                                                                         free(aux);
                                                                                                                 };
+                                                                                                                if(tabela==NULL){
+                                                                                                                        tabela=initTabela();
+                                                                                                                };
+                                                                                                                var = createVar($4, $3->type);
+                                                                                                                var->isMethod=0;
+                                                                                                                printf("%s", var->nome);
+                                                                                                                tabela=addSymbolToClass(tabela, var);
                                                         }
           |error SEMICOLON {$$=NULL; printError = 1;}
           ;
@@ -101,29 +113,29 @@ Type: BOOL {$$ = createNode("Bool", "");}
 
 MethodHeader: Type ID LPAR FormalParams RPAR {$$ = createNode("MethodHeader", ""); addNode($$, $1); addBrother($1, createNode("Id", $2));
                                                                                 aux = createNode("MethodParams", ""); addBrother($1, aux); addNode(aux, $4);
-                                                                                method=createMethod($2, $1->info);
-                                                                                tabela=addSymbolToClass(tabela, method);                                                                                
+                                                                                method=createMethod($2, $1->type);
+                                                                                tabela=addSymbolToClass(tabela, method);                                                                               
 
                                                 }                                                
             | VOID ID LPAR FormalParams RPAR {$$ = createNode("MethodHeader", ""); $1= createNode("Void", ""); addNode($$,$1); addBrother($1,createNode("Id", $2));
                                                                                 aux = createNode("MethodParams", ""); addBrother($1, aux); addNode(aux,$4);
                                                                                 method=createMethod($2, "void");
-                                                                                tabela=addSymbolToClass(tabela, method);
+                                                                                tabela=addSymbolToClass(tabela, method);  
                                                 }
             | VOID ID LPAR RPAR {$$ = createNode("MethodHeader", ""); $1= createNode("Void", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));
                                                                                 method=createMethod($2, "void");
-                                                                                tabela=addSymbolToClass(tabela, method);
+                                                                                tabela=addSymbolToClass(tabela, method); 
                                                                                 }
             | Type ID LPAR RPAR {$$ = createNode("MethodHeader", ""); addNode($$,$1); addBrother($1, createNode("Id", $2));
-                                                                                method=createMethod($2, $1->info);
-                                                                                tabela=addSymbolToClass(tabela, method);
+                                                                                method=createMethod($2, $1->type);
+                                                                                tabela=addSymbolToClass(tabela, method);  
                                                                                 }
             ;
 
 FormalParams:Type ID FormalParamsAux{$$= createNode("ParamDecl", ""); addNode($$,$1); aux = createNode("Id", $2);
                                                                     addBrother($1, aux);
                                                                     addBrother($$, $3);
-                                                                    var=createVar($2, $1->info);
+                                                                    var=createVar($2, $1->type);
                                                                     var->isParams=1;
                                                                     method = addSymbolToMethod(method, var);
                                                                 }
@@ -137,8 +149,9 @@ FormalParams:Type ID FormalParamsAux{$$= createNode("ParamDecl", ""); addNode($$
 
 FormalParamsAux: COMMA Type ID FormalParamsAux{$$ = createNode("ParamDecl", ""); aux = createNode("Id", $3);
                                                 addNode($$,$2); addBrother($2,aux); addBrother($$,$4);
-                                                var=createVar($3, $2->info);
+                                                var=createVar($3, $2->type);
                                                 var->isParams=1;
+                                                method = addSymbolToMethod(method, var);
                 }
                 |/*vazio*/ {$$ = NULL;}
                 ;
@@ -168,11 +181,10 @@ VarDecl: Type ID AdditionalDecl SEMICOLON {$$ = createNode("VarDecl", ""); addNo
                                                                                 tabela=initTabela();
                                                                         };
                                                                         var=createVar($2, $1->type);
-                                                                        
                                                                         if(method==NULL){                                                                        if(method==NULL){
                                                                                 addSymbolToClass(tabela, var);
                                                                         }else{
-                                                                                addSymbolToMethod(method, var);
+                                                                                addVarToMethod(method, var);
                                                                         }}
                                         }
         ;
