@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "tree.h"
-#include "tabela.h"
 #include "y.tab.h"
 #define LINHA linha++; coluna=1;
 #define COLUNA coluna+=yyleng;
@@ -164,6 +163,7 @@ int main(int argc, char *argv[]){
         yyparse();
         yylex_destroy();
         if(printTreeFlag == 1 && printError == 0){
+            tabela = fazTabela(root);
     	    printTree(root,0);
             printTabela(tabela);
         }
