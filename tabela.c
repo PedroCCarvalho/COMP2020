@@ -25,13 +25,16 @@ noGlobal fazTabela(node root){
             addSymbolToClass(tabela, method);
         }
         if(strcmp(aux->type, "MethodDecl")==0){
+            printf("boas\n");
             aux2=aux->child;
             aux2=aux2->child;
             method = initMethod();
             method->tipo=strdup(aux2->type);
             aux2=aux2->brother;
             method->nome=strdup(aux2->info);
-            aux2=aux2->brother;
+            tabela=addSymbolToClass(tabela, method);
+            if(aux2->brother!=NULL){
+                aux2=aux2->brother->child;
             while(aux2!=NULL){
                 methodAux=initMethod();
                 methodAux->tipo = (char*)malloc(1+strlen(aux2->child->type)*sizeof(char));
@@ -40,10 +43,12 @@ noGlobal fazTabela(node root){
                 methodAux->tipo=strdup(aux2->child->brother->info);
                 methodAux->isMethod=0;
                 method=addSymbolToMethod(method, methodAux);
+                printf("ola\n");
                 aux2=aux2->brother;
             }
+            }
+            
         }
-        printf("boas\n");
         aux=aux->brother;
     }
     return tabela;
@@ -201,7 +206,7 @@ void printTabela(noGlobal no){
                     printf("(");
                     paramAux = symbolAux->vars;
                     while(paramAux != NULL){
-                        printf("%s ",paramAux->tipo);
+                        printf("%s,",paramAux->tipo);
                         paramAux = paramAux->irmao;    
                     }        
                     printf(")\t");
